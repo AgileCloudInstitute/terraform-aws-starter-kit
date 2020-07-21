@@ -1,5 +1,7 @@
 #!/bin/bash
 
+echo "First parameter is: "
+echo $1
 echo 'About to demonstrate that keys remain encrypted but are also imported: '  
 echo "AWS private key is: $(-aws-public-access-key)"  
 echo "AWS secret key: $(-aws-secret-access-key)"  
