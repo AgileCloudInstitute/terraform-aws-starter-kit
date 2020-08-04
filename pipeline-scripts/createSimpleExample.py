@@ -103,10 +103,8 @@ runTerraformCommand(initCommand, subDir4 )
 
 print("About to call terraform apply.  ")
 
-#EITHER RUN ONE OR THE OTHER OF THE FOLLOWING TWO:  APPLY OR DESTROY  (WILL BE SEPARATED INTO TWO RELEASE TEMPLATES LATER.)
+applyCommand="terraform apply -auto-approve -var 'aws_region="+awsRegion+"' -var '_public_access_key="+awsPublicAccessKey+"' -var '_secret_access_key="+awsSecretAccessKey+"' -var 'vpcName="+vpc_name+"' -var 'systemName="+system_name+"' -var 'environmentName="+environment_name+"' -var 'ownerName="+owner_name+"' -var 'vmName="+vm_name+"'" 
+runTerraformCommand(applyCommand, subDir4 )
 
-#applyCommand="terraform apply -auto-approve -var 'aws_region="+awsRegion+"' -var '_public_access_key="+awsPublicAccessKey+"' -var '_secret_access_key="+awsSecretAccessKey+"' -var 'vpcName="+vpc_name+"' -var 'systemName="+system_name+"' -var 'environmentName="+environment_name+"' -var 'ownerName="+owner_name+"' -var 'vmName="+vm_name+"'" 
-#runTerraformCommand(applyCommand, subDir4 )
-
-destroyCommand="terraform destroy -auto-approve -var 'aws_region="+awsRegion+"' -var '_public_access_key="+awsPublicAccessKey+"' -var '_secret_access_key="+awsSecretAccessKey+"' -var 'vpcName="+vpc_name+"' -var 'systemName="+system_name+"' -var 'environmentName="+environment_name+"' -var 'ownerName="+owner_name+"' -var 'vmName="+vm_name+"'" 
-runTerraformCommand(destroyCommand, subDir4 )
+#destroyCommand="terraform destroy -auto-approve -var 'aws_region="+awsRegion+"' -var '_public_access_key="+awsPublicAccessKey+"' -var '_secret_access_key="+awsSecretAccessKey+"' -var 'vpcName="+vpc_name+"' -var 'systemName="+system_name+"' -var 'environmentName="+environment_name+"' -var 'ownerName="+owner_name+"' -var 'vmName="+vm_name+"'" 
+#runTerraformCommand(destroyCommand, subDir4 )
