@@ -4,15 +4,6 @@
 import subprocess  
 import sys  
 import os  
-  
-region=sys.argv[1]  
-print("region variable is: ")  
-print(region)  
-
-print("public key is: ")
-print(os.environ['AWS_PUB'])
-print("secret key is: ")
-print(os.environ['AWS_SECRET'])
 
 destroyCommand="terraform destroy -auto-approve -var 'aws_region="+region+"' -var '_public_access_key="+os.environ['AWS_PUB']+"' -var '_secret_access_key="+os.environ['AWS_SECRET']+"'"
 
