@@ -41,3 +41,16 @@ resource "aws_route_table_association" "example-host" {
   subnet_id      = aws_subnet.example-host.id
   route_table_id = aws_route_table.example-host.id
 }
+
+resource "aws_security_group" "example-hosts" {
+  name        = "example node"
+  description = "Security group"
+  vpc_id      = aws_vpc.example-host.id  
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}

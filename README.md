@@ -1,4 +1,4 @@
-# terraform-aws-simple-example  
+# terraform-aws-starter-kit
 Working example of creating basic aws instrustructure including EC2 VM in VPC  
     
 ##  This repo can either be:  
@@ -20,8 +20,8 @@ Working example of creating basic aws instrustructure including EC2 VM in VPC
 13.  Change your password immediately upon logging in by typing the commands given below.  Write down your replacement password somewhere safe so that you remember it.  Again note that putting a password in USERDATA is bad practice.  We are only doing it here to keep this example very simple.  
     
         $ passwd  
-        Changing password for user aci-user.  
-        Changing password for aci-user.  
+        Changing password for user agile-cloud.  
+        Changing password for agile-cloud.  
         (current) UNIX password:  
         New password:  
         Retype new password:  

@@ -19,14 +19,13 @@ data "aws_ami" "amazon-linux-2" {
 }  
 
 resource "aws_instance" "example-host" {
-  depends_on = [aws_internet_gateway.example-host]
   ami                         = data.aws_ami.amazon-linux-2.id
   associate_public_ip_address = true
   instance_type               = "t2.micro"
   user_data_base64 = base64encode(local.example-host-userdata)
   source_dest_check           = false
-  subnet_id = aws_subnet.example-host.id
-  vpc_security_group_ids = [aws_security_group.example-hosts.id]
+  subnet_id = var.subnetId 
+  vpc_security_group_ids = [var.sgId]
 
   timeouts {
     create = "60m"

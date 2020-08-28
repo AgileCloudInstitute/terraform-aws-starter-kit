@@ -9,19 +9,21 @@ locals {
   example-host-userdata = <<USERDATA
 #!/bin/bash -xe
 
-#SECURITY HOLE: Just for easy demonstration, the following enables password login and creates an aci-user with a password exposed in version control. 
+#SECURITY HOLE: Just for easy demonstration, the following enables password login and creates an agile-cloud with a password exposed in version control. 
 #Replace the following 4 lines with something more secure when you establish a secrets management system.
-/usr/sbin/useradd aci-user
-echo aci-user:just-for-demo123 | chpasswd
-echo 'aci-user ALL=(ALL:ALL) ALL' | sudo EDITOR='tee -a' visudo
+/usr/sbin/useradd agile-cloud
+echo agile-cloud:just-for-demo123 | chpasswd
+echo 'agile-cloud ALL=(ALL:ALL) ALL' | sudo EDITOR='tee -a' visudo
 sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/' /etc/ssh/sshd_config
 systemctl restart sshd
 
-mkdir /home/aci-user/cloned-repos
-mkdir /home/aci-user/vars
+mkdir /home/agile-cloud/cloned-repos
+mkdir /home/agile-cloud/vars
+mkdir /home/agile-cloud/staging
 
-chown -R aci-user:aci-user /home/aci-user/vars
-chown -R aci-user:aci-user /home/aci-user/cloned-repos
+chown -R agile-cloud:agile-cloud /home/agile-cloud/vars
+chown -R agile-cloud:agile-cloud /home/agile-cloud/cloned-repos
+chown -R agile-cloud:agile-cloud /home/agile-cloud/staging
 
 ### Install software
 yum -y update

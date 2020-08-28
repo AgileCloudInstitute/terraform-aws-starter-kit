@@ -1,21 +1,21 @@
-terraform-aws-simple-example (Licensed Product) and all its components are protected by 
+terraform-aws-starter-kit (Licensed Product) and all its components are protected by 
 copyright, and are distributed under the following terms.  
   
-terraform-aws-simple-example, developed and copyrighted by Green River IT Incorporated 
+terraform-aws-starter-kit, developed and copyrighted by Green River IT Incorporated 
 (Green River IT) is intended to serve as a working example of the foundation of a 
 software-defined data center, capable of creating, updating, and deleting cloud 
 resources.    
   
-Since terraform-aws-simple-example is open source and free of licensing fees, you are 
+Since terraform-aws-starter-kit is open source and free of licensing fees, you are 
 free to use, modify, and distribute the source code, as long as you include this 
 copyright statement.  
   
-In particular, you can use terraform-aws-simple-example to 
+In particular, you can use terraform-aws-starter-kit to 
 build proprietary software and are under no obligation to redistribute any of your 
-source code that is built using terraform-aws-simple-example.  Note however, that you 
-may not do anything to the terraform-aws-simple-example code, such as copyrighting it 
-yourself or claiming authorship of terraform-aws-simple-example, that will prevent 
-terraform-aws-simple-example from being distributed freely using an open source 
+source code that is built using terraform-aws-starter-kit.  Note however, that you 
+may not do anything to the terraform-aws-starter-kit code, such as copyrighting it 
+yourself or claiming authorship of terraform-aws-starter-kit, that will prevent 
+terraform-aws-starter-kit from being distributed freely using an open source 
 development model.  
   
 Warranty  
@@ -45,4 +45,4 @@ LIABLE FOR ANY LOST REVENUE OR PROFITS OR OTHER SPECIAL, INDIRECT AND
 CONSEQUENTIAL DAMAGES, EVEN IF GREEN RIVER IT HAS BEEN ADVISED OF THE 
 POSSIBILITY OF SUCH DAMAGES.  
   
-terraform-aws-simple-example copyright Green River IT. Placerville CA USA, 2019.  
+terraform-aws-starter-kit copyright Green River IT. Placerville CA USA, 2020.  

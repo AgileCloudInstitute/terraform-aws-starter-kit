@@ -18,7 +18,6 @@ steps:
     mv LICENSE.txt $(Build.ArtifactStagingDirectory)
     mv calls-to-modules $(Build.ArtifactStagingDirectory)
     mv modules $(Build.ArtifactStagingDirectory)
-    mv pipeline-scripts $(Build.ArtifactStagingDirectory)
     echo About to list contents of Artifact Staging Directory
     ls -al $(Build.ArtifactStagingDirectory)
   displayName: 'Run a multi-line script'
