@@ -3,15 +3,8 @@ import re
 import os	
 import subprocess  	
 from pathlib import Path	
-#//The following imports are new:  
 import pip  
-failed = pip.main(["install", 'requests'])  
-print("status of requests install: ", failed)  
-failed = pip.main(["install", 'pyyaml'])  
-print("status of pyyaml install: ", failed)  
 import deploymentFunctions as depfunc  
-import re  
-#//
 
 ansi_escape = re.compile(r'\x1B\[[0-?]*[ -/]*[@-~]')	
 
@@ -22,7 +15,6 @@ def runTerraformCommand(commandToRun, workingDir ):
     print("Inside runTerraformCommand(..., ...) function. ")	
     print("commandToRun is: " +commandToRun)	
     print("workingDir is: " +workingDir)	
-
     proc = subprocess.Popen( commandToRun,cwd=workingDir,stdout=subprocess.PIPE, shell=True)	
     while True:	
       line = proc.stdout.readline()	
@@ -44,7 +36,8 @@ awsRegion=sys.argv[5]
 DefaultWorkingDirectory=sys.argv[6] 	
 #The following 7 need to be made into input variables	
 resourceGroupName="pipeline-resources"	
-storageContainerName="aws-simple-network-foundation"
+storageContainerName="terraform-backend-aws-starter-kit"
+terraKeyFileName = "aws-simple-network-foundation-state.tf"
 vpc_name="thisVPC"
 system_name="thisSystem"
 environment_name="thisEnvironment"
@@ -59,18 +52,12 @@ print("terraBackendKey is: ", terraBackendKey)
 print("awsRegion is: ", awsRegion)	
 print("DefaultWorkingDirectory is: ", DefaultWorkingDirectory)	
   
-# #print(*Path("/home/username/www/").iterdir(), sep="\n")	
-
 ####################################################################################
 ### Set values for pathToApplicationRoot and dirToUseNet  
 ### while also listing contents of each directory  
 ####################################################################################
 print("About to list contents of DefaultWorkingDirectory")	
 print(*Path(DefaultWorkingDirectory).iterdir(), sep="\n")	
-
-subDir1=DefaultWorkingDirectory+"/_terraform-aws-starter-kit"	
-print("About to list contents of (DefaultWorkingDirectory)/_terraform-aws-starter-kit")	
-print(*Path(subDir1).iterdir(), sep="\n")	
 
 subDir2=DefaultWorkingDirectory+"/_terraform-aws-starter-kit/drop"	
 print("About to list contents of (DefaultWorkingDirectory)/_terraform-aws-starter-kit/drop")	
@@ -85,8 +72,9 @@ print(*Path(subDir3).iterdir(), sep="\n")
 subDir4=DefaultWorkingDirectory+"/_terraform-aws-starter-kit/drop/calls-to-modules/aws-simple-network-foundation-call-to-module/"	
 print("About to list contents of (DefaultWorkingDirectory)/_terraform-aws-starter-kit/drop/calls-to-modules/aws-simple-network-foundation-call-to-module/")	
 print(*Path(subDir4).iterdir(), sep="\n")	
-
+  
 dirToUseNet = subDir4   
+print("dirToUseNet is: ", dirToUseNet)  
 
 subDir5=DefaultWorkingDirectory+"/_terraform-aws-starter-kit/drop/calls-to-modules/aws-simple-s3-backend-call-to-module/"	
 print("About to list contents of (DefaultWorkingDirectory)/_terraform-aws-starter-kit/drop/calls-to-modules/aws-simple-s3-backend-call-to-module/")	
@@ -106,7 +94,7 @@ print(*Path(subDir7).iterdir(), sep="\n")
 resourceGroupNameLine="    resource_group_name  = \""+resourceGroupName+"\"\n"	
 storageAccountNameTerraformBackendLine="    storage_account_name = \""+storageAccountNameTerraformBackend+"\"\n"	
 storageContainerNameLine="    container_name       = \""+storageContainerName+"\"\n"	
-terraBackendKeyLine="    key                  = \""+terraBackendKey+"\"\n"	
+terraBackendKeyLine="    key                  = \""+terraKeyFileName+"\"\n"	
 
 tfFileNameAndPath=dirToUseNet+"/terraform.tf"	
 print("tfFileNameAndPath is: ", tfFileNameAndPath)	
@@ -133,9 +121,6 @@ print(*Path(dirToUseNet).iterdir(), sep="\n")
 print("About to call terraform init:  ")	
 initCommand="terraform init -backend=true -backend-config=\"access_key="+terraBackendKey+"\""  	
 runTerraformCommand(initCommand, dirToUseNet )	
-#Replace the preceding 2 lines with the following 2 lines  
-#initCommand = 'terraform init '
-#depfunc.runTerraformCommand(initCommand, dirToUseNet)
   
 #############################################################################
 ### Create the network foundation
@@ -147,23 +132,24 @@ varsFragmentFoundation = varsFragmentFoundation + " -var=\"vpcName=" + vpc_name 
 varsFragmentFoundation = varsFragmentFoundation + " -var=\"systemName=" + system_name +"\""  
 varsFragmentFoundation = varsFragmentFoundation + " -var=\"environmentName=" + environment_name +"\""  
 varsFragmentFoundation = varsFragmentFoundation + " -var=\"ownerName=" + owner_name +"\""  
-#varsFragmentFoundation = varsFragmentFoundation + " -var=\"vmName=" + vm_name +"\""  
 varsFragmentFoundation = varsFragmentFoundation + " -var=\"_public_access_key=" + awsPublicAccessKey +"\""  
 varsFragmentFoundation = varsFragmentFoundation + " -var=\"_secret_access_key=" + awsSecretAccessKey +"\""  
-#varsFragmentFoundation = varsFragmentFoundation + " -var=\"amiId=ami-id-goesw-here\""  
-#varsFragmentFoundation = varsFragmentFoundation + " -var=\"s3BucketNameTF=bucket-name-goes-here\""  
-#varsFragmentFoundation = varsFragmentFoundation + " -var=\"dynamoDbTableNameTF=table-name-goes-here\""  
 varsFoundation = varsFragmentFoundation
 print("varsFoundation is: ", varsFoundation)  
 applyCommandNet = "terraform apply -auto-approve" + varsFoundation
 print("applyCommandNet is: ", applyCommandNet)
-#UNCOMMENT NEXT LINE TO ACTIVATE APPLY AFTER VALIDATING THE INIT OF THE BACKEND ETC AND EVERYTHING ELSE ABOVE.  
-#depfunc.runTerraformCommand(applyCommandNet, dirToUseNet)  
-  
+runTerraformCommand(applyCommandNet, dirToUseNet)  
+
+#THE FOLLOWING ARE FOR OTHER MODULES:  
+#varsFragmentFoundation = varsFragmentFoundation + " -var=\"vmName=" + vm_name +"\""  
+#varsFragmentFoundation = varsFragmentFoundation + " -var=\"amiId=ami-id-goesw-here\""  
+#varsFragmentFoundation = varsFragmentFoundation + " -var=\"s3BucketNameTF=bucket-name-goes-here\""  
+#varsFragmentFoundation = varsFragmentFoundation + " -var=\"dynamoDbTableNameTF=table-name-goes-here\""  
+
+
 #FOLLOWING 5 LINES ARE FROM PRIOR VERSION  
 # print("About to call terraform apply.  ")  
 # applyCommand="terraform apply -auto-approve -var 'aws_region="+awsRegion+"' -var '_public_access_key="+awsPublicAccessKey+"' -var '_secret_access_key="+awsSecretAccessKey+"' -var 'vpcName="+vpc_name+"' -var 'systemName="+system_name+"' -var 'environmentName="+environment_name+"' -var 'ownerName="+owner_name+"' -var 'vmName="+vm_name+"'"  
 # runTerraformCommand(applyCommand, subDir4 )  
 # #destroyCommand="terraform destroy -auto-approve -var 'aws_region="+awsRegion+"' -var '_public_access_key="+awsPublicAccessKey+"' -var '_secret_access_key="+awsSecretAccessKey+"' -var 'vpcName="+vpc_name+"' -var 'systemName="+system_name+"' -var 'environmentName="+environment_name+"' -var 'ownerName="+owner_name+"' -var 'vmName="+vm_name+"'"  
 # #runTerraformCommand(destroyCommand, subDir4 )  
-  
