@@ -147,9 +147,7 @@ runTerraformCommand(applyCommandNet, dirToUseNet)
 #varsFragmentFoundation = varsFragmentFoundation + " -var=\"dynamoDbTableNameTF=table-name-goes-here\""  
 
 
-#FOLLOWING 5 LINES ARE FROM PRIOR VERSION  
-# print("About to call terraform apply.  ")  
-# applyCommand="terraform apply -auto-approve -var 'aws_region="+awsRegion+"' -var '_public_access_key="+awsPublicAccessKey+"' -var '_secret_access_key="+awsSecretAccessKey+"' -var 'vpcName="+vpc_name+"' -var 'systemName="+system_name+"' -var 'environmentName="+environment_name+"' -var 'ownerName="+owner_name+"' -var 'vmName="+vm_name+"'"  
-# runTerraformCommand(applyCommand, subDir4 )  
-# #destroyCommand="terraform destroy -auto-approve -var 'aws_region="+awsRegion+"' -var '_public_access_key="+awsPublicAccessKey+"' -var '_secret_access_key="+awsSecretAccessKey+"' -var 'vpcName="+vpc_name+"' -var 'systemName="+system_name+"' -var 'environmentName="+environment_name+"' -var 'ownerName="+owner_name+"' -var 'vmName="+vm_name+"'"  
-# #runTerraformCommand(destroyCommand, subDir4 )  
+#DELETE BY UNCOMMENTING THE FOLLOWING DURING DEVELOPMENT, THEN MAKE SEPARATE FILE FOR RELEASE:  
+# print("About to call terraform destroy.  ")    
+# destroyCommand="terraform destroy -auto-approve" + varsFoundation
+# runTerraformCommand(destroyCommand, subDir4 )  
