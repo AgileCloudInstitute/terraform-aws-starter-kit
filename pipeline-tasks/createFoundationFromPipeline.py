@@ -5,10 +5,24 @@ import subprocess
 from pathlib import Path	
 import pip  
 import deploymentFunctions as depfunc  
-
+ 
 ansi_escape = re.compile(r'\x1B\[[0-?]*[ -/]*[@-~]')	
 
 print("Hello from inside createStarterFromPipeline.py ")  	
+
+def runShellCommand(commandToRun):
+    print("Inside runShellCommand(..., ...) function. ")
+    print("commandToRun is: " +commandToRun)
+
+    proc = subprocess.Popen( commandToRun,cwd=None, stdout=subprocess.PIPE, shell=True)
+    while True:
+      line = proc.stdout.readline()
+      if line:
+        thetext=line.decode('utf-8').rstrip('\r|\n')
+        decodedline=ansi_escape.sub('', thetext)
+        print(decodedline)
+      else:
+        break
 
 #Re-usable function that will be replaced with something already in depfunc
 def runTerraformCommand(commandToRun, workingDir ):	
@@ -34,16 +48,39 @@ storageAccountNameTerraformBackend=sys.argv[3]
 terraBackendKey=sys.argv[4] 	
 awsRegion=sys.argv[5] 	
 DefaultWorkingDirectory=sys.argv[6] 	
+demoStorageKey=sys.argv[7]
+#clientSecret=sys.argv[8]
+#subscriptionId=sys.argv[9]
+#tenandId=sys.argv[10]
+#$(client-id)  $(client-secret)  $(subscription-id)  $(tenant-id)  
 #The following 7 need to be made into input variables	
 resourceGroupName="pipeline-resources"	
-storageContainerName="terraform-backend-aws-starter-kit"
+storageAccountNameTerraformBackend='tfbkendabc123x'
+storageContainerName="tfcontainer"
 terraKeyFileName = "aws-simple-network-foundation-state.tf"
 vpc_name="thisVPC"
 system_name="thisSystem"
 environment_name="thisEnvironment"
 owner_name="thisOwner"
-vm_name="thisVM"
+vm_name="thisVM"  
 
+exportString = 'export ARM_ACCESS_KEY=' +demoStorageKey +"\n"
+with open(os.path.expanduser("/home/azureuser/.bashrc"), "a") as outfile:
+    # 'a' stands for "append"  
+    outfile.write(exportString)
+#"export MYVAR=MYVALUE"
+print("About to read the /home/azureuser/.bashrc file we just wrote to.")	
+#open and read the file after the appending: 
+f = open("/home/azureuser/.bashrc", "r") 
+print(f.read()) 
+
+print("about to whoami: ")
+runShellCommand("whoami")
+ 
+print("about to echo ARM_ACCESS_KEY : ")
+runShellCommand("echo $ARM_ACCESS_KEY")
+#print(os.environ)
+#print("ARM_ACCESS_KEY environment variable is: ", os.environ['ARM_ACCESS_KEY'])
 print("Python version is: ", sys.version_info[0])  	
 print("awsPublicAccessKey is: ", awsPublicAccessKey)	
 print("awsSecretAccessKey is: ", awsSecretAccessKey)	
@@ -51,7 +88,14 @@ print("storageAccountNameTerraformBackend is: ", storageAccountNameTerraformBack
 print("terraBackendKey is: ", terraBackendKey)	
 print("awsRegion is: ", awsRegion)	
 print("DefaultWorkingDirectory is: ", DefaultWorkingDirectory)	
-  
+print("demoStorageKey is: ", demoStorageKey)
+#print("clientSecret is: ", clientSecret)
+#print("subscriptionId is: ", subscriptionId)
+#print("tenandId is: ", tenandId)
+
+#Set environment variable
+#os.environ["ARM_ACCESS_KEY"] = demoStorageKey
+
 ####################################################################################
 ### Set values for pathToApplicationRoot and dirToUseNet  
 ### while also listing contents of each directory  
@@ -96,6 +140,16 @@ storageAccountNameTerraformBackendLine="    storage_account_name = \""+storageAc
 storageContainerNameLine="    container_name       = \""+storageContainerName+"\"\n"	
 terraBackendKeyLine="    key                  = \""+terraKeyFileName+"\"\n"	
 
+# terraform {
+#   backend "azurerm" {
+#     resource_group_name   = "pipeline-resources"
+#     storage_account_name  = "tstate17202"
+#     container_name        = "tstate"
+#     key                   = "terraform.tfstate"
+#   }
+# }
+
+
 tfFileNameAndPath=dirToUseNet+"/terraform.tf"	
 print("tfFileNameAndPath is: ", tfFileNameAndPath)	
 print("About to write 8 lines to a file.")	
@@ -118,8 +172,13 @@ print(f.read())
 print("About to refresh list contents of (DefaultWorkingDirectory)/_terraform-aws-starter-kit/drop/calls-to-modules/aws-simple-network-foundation-call-to-module/")	
 print(*Path(dirToUseNet).iterdir(), sep="\n")	
 
+
 print("About to call terraform init:  ")	
-initCommand="terraform init -backend=true -backend-config=\"access_key="+terraBackendKey+"\""  	
+#initCommand="terraform init -backend=true "  	
+#initCommand="terraform init -backend=true -backend-config=\"access_key="+demoStorageKey+"\""  	
+initCommand="terraform init "
+# -backend=true -backend-config=\"client_id="+clientId+"\" " + "-backend-config=\"client_secret="+clientSecret+"\" " + "-backend-config=\"subscription_id="+subscriptionId+"\" " + "-backend-config=\"tenant_id="+tenandId+"\""  	
+
 runTerraformCommand(initCommand, dirToUseNet )	
   
 #############################################################################
