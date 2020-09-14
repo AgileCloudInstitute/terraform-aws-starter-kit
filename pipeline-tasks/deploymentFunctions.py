@@ -10,6 +10,37 @@ subnet_id = ''
 sg_id = ''  
 sg_name = ''  
 
+def runShellCommand(commandToRun):
+    print("Inside runShellCommand(...) function. ")
+    print("commandToRun is: " +commandToRun)
+
+    proc = subprocess.Popen( commandToRun,cwd=None, stdout=subprocess.PIPE, shell=True)
+    while True:
+      line = proc.stdout.readline()
+      if line:
+        thetext=line.decode('utf-8').rstrip('\r|\n')
+        decodedline=ansi_escape.sub('', thetext)
+        print(decodedline)
+      else:
+        break
+
+# #Took the following from createFoundationFromPipeline.py .  Note to delete this version if tests pass.  
+# #Re-usable function that will be replaced with something already in depfunc
+# def runTerraformCommand(commandToRun, workingDir ):	
+#     print("Inside runTerraformCommand(..., ...) function. ")	
+#     print("commandToRun is: " +commandToRun)	
+#     print("workingDir is: " +workingDir)	
+#     proc = subprocess.Popen( commandToRun,cwd=workingDir,stdout=subprocess.PIPE, shell=True)	
+#     while True:	
+#       line = proc.stdout.readline()	
+#       if line:	
+#         thetext=line.decode('utf-8').rstrip('\r|\n')	
+#         decodedline=ansi_escape.sub('', thetext)	
+#         print(decodedline)	
+#       else:	
+#         print("About to break. ")
+#         break	
+
 def runTerraformCommand(commandToRun, workingDir ):
     print("Inside deploymentFunctions.py script and runTerraformCommand(..., ...) function. ")
     print("commandToRun is: " +commandToRun)
@@ -53,6 +84,43 @@ def runTerraformCommand(commandToRun, workingDir ):
       else:
         break
 
+def createBackendConfigFileTerraform(resource_group_name, storage_account_name_terraform_backend, storage_container_name, terra_key_file_name, dir_to_use_net ): 
+  resourceGroupNameLine="    resource_group_name  = \""+resource_group_name+"\"\n"	
+  storageAccountNameTerraformBackendLine="    storage_account_name = \""+storage_account_name_terraform_backend+"\"\n"	
+  storageContainerNameLine="    container_name       = \""+storage_container_name+"\"\n"	
+  terraBackendKeyLine="    key                  = \""+terra_key_file_name+"\"\n"	
+  tfFileNameAndPath=dir_to_use_net+"/terraform.tf" 
+  print("tfFileNameAndPath is: ", tfFileNameAndPath)	
+  print("About to write 8 lines to a file.")	
+  f = open(tfFileNameAndPath, "w")	
+  f.write("terraform {\n")	
+  f.write("  backend \"azurerm\" {\n")	
+  f.write(resourceGroupNameLine)	
+  f.write(storageAccountNameTerraformBackendLine)	
+  f.write(storageContainerNameLine)	
+  f.write(terraBackendKeyLine)	
+  f.write("  }\n")	
+  f.write("}\n")	
+  f.close()	
+
+def getInputVarsFoundationFromPipeline(aws_region, vpcName, systemName, environmentName, owner_name, aws_public_access_key, aws_secret_access_key, foundation_secrets_file):  
+  varsFragmentFoundation = ""  
+  varsFragmentFoundation = varsFragmentFoundation + " -var=\"aws_region=" + aws_region +"\""  
+  varsFragmentFoundation = varsFragmentFoundation + " -var=\"vpcName=" + vpcName +"\""  
+  varsFragmentFoundation = varsFragmentFoundation + " -var=\"systemName=" + systemName +"\""  
+  varsFragmentFoundation = varsFragmentFoundation + " -var=\"environmentName=" + environmentName +"\""  
+  varsFragmentFoundation = varsFragmentFoundation + " -var=\"ownerName=" + owner_name +"\""  
+  if len(aws_public_access_key)>2 or len(aws_secret_access_key)>2 :  
+    with open(foundation_secrets_file, "w") as file:
+      if len(aws_public_access_key) > 2:
+        lineToAdd = "_public_access_key=\""+aws_public_access_key +"\"\n"
+        file.write(lineToAdd)
+      if len(aws_secret_access_key) > 2:
+        lineToAdd = "_secret_access_key=\""+aws_secret_access_key +"\"\n"
+        file.write(lineToAdd)
+    varsFragmentFoundation = varsFragmentFoundation + " -var-file=\""+ foundation_secrets_file +"\""
+  return varsFragmentFoundation
+  
 def getVarsFragmentFoundation(yamlFileAndPath):  
   varsFragmentFoundation = ""  
   with open(yamlFileAndPath) as f:  
