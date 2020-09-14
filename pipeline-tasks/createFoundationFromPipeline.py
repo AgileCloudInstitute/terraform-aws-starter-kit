@@ -64,21 +64,21 @@ environment_name="thisEnvironment"
 owner_name="thisOwner"
 vm_name="thisVM"  
 
-exportString = 'export ARM_ACCESS_KEY=' +demoStorageKey +"\n"
-with open(os.path.expanduser("/home/azureuser/.bashrc"), "a") as outfile:
-    # 'a' stands for "append"  
-    outfile.write(exportString)
-#"export MYVAR=MYVALUE"
-print("About to read the /home/azureuser/.bashrc file we just wrote to.")	
-#open and read the file after the appending: 
-f = open("/home/azureuser/.bashrc", "r") 
-print(f.read()) 
+# exportString = 'export ARM_ACCESS_KEY=' +demoStorageKey +"\n"
+# with open(os.path.expanduser("/home/azureuser/.bashrc"), "a") as outfile:
+#     # 'a' stands for "append"  
+#     outfile.write(exportString)
+# #"export MYVAR=MYVALUE"
+# print("About to read the /home/azureuser/.bashrc file we just wrote to.")	
+# #open and read the file after the appending: 
+# f = open("/home/azureuser/.bashrc", "r") 
+# print(f.read()) 
 
 print("about to whoami: ")
 runShellCommand("whoami")
  
-print("about to echo ARM_ACCESS_KEY : ")
-runShellCommand("echo $ARM_ACCESS_KEY")
+# print("about to echo ARM_ACCESS_KEY : ")
+# runShellCommand("echo $ARM_ACCESS_KEY")
 #print(os.environ)
 #print("ARM_ACCESS_KEY environment variable is: ", os.environ['ARM_ACCESS_KEY'])
 print("Python version is: ", sys.version_info[0])  	
