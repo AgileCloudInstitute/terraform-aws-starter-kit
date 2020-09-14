@@ -31,13 +31,23 @@ def runTerraformCommand(commandToRun, workingDir ):
     print("workingDir is: " +workingDir)	
     proc = subprocess.Popen( commandToRun,cwd=workingDir,stdout=subprocess.PIPE, shell=True)	
     while True:	
+      print("there is a subprocess.  ")
       line = proc.stdout.readline()	
       if line:	
+        print("there is a line. ")
         thetext=line.decode('utf-8').rstrip('\r|\n')	
         decodedline=ansi_escape.sub('', thetext)	
         print(decodedline)	
       else:	
+        print("About to break. ")
         break	
+
+###############################################################################
+### Check to see if storage key environment variable was set
+###############################################################################
+print("about to echo ARM_ACCESS_KEY : ")
+runShellCommand("echo $ARM_ACCESS_KEY")
+
 
 ###############################################################################
 ### Print vars to validate that they are imported and also obscured
@@ -89,6 +99,7 @@ print("terraBackendKey is: ", terraBackendKey)
 print("awsRegion is: ", awsRegion)	
 print("DefaultWorkingDirectory is: ", DefaultWorkingDirectory)	
 print("demoStorageKey is: ", demoStorageKey)
+foundationSecretsFile = '/home/azureuser/' + 'foundationSecrets.tfvars'
 #print("clientSecret is: ", clientSecret)
 #print("subscriptionId is: ", subscriptionId)
 #print("tenandId is: ", tenandId)
@@ -175,8 +186,8 @@ print(*Path(dirToUseNet).iterdir(), sep="\n")
 
 print("About to call terraform init:  ")	
 #initCommand="terraform init -backend=true "  	
-#initCommand="terraform init -backend=true -backend-config=\"access_key="+demoStorageKey+"\""  	
-initCommand="terraform init "
+initCommand="terraform init -backend=true -backend-config=\"access_key="+demoStorageKey+"\""  	
+# initCommand="terraform init "
 # -backend=true -backend-config=\"client_id="+clientId+"\" " + "-backend-config=\"client_secret="+clientSecret+"\" " + "-backend-config=\"subscription_id="+subscriptionId+"\" " + "-backend-config=\"tenant_id="+tenandId+"\""  	
 
 runTerraformCommand(initCommand, dirToUseNet )	
@@ -191,13 +202,26 @@ varsFragmentFoundation = varsFragmentFoundation + " -var=\"vpcName=" + vpc_name 
 varsFragmentFoundation = varsFragmentFoundation + " -var=\"systemName=" + system_name +"\""  
 varsFragmentFoundation = varsFragmentFoundation + " -var=\"environmentName=" + environment_name +"\""  
 varsFragmentFoundation = varsFragmentFoundation + " -var=\"ownerName=" + owner_name +"\""  
-varsFragmentFoundation = varsFragmentFoundation + " -var=\"_public_access_key=" + awsPublicAccessKey +"\""  
-varsFragmentFoundation = varsFragmentFoundation + " -var=\"_secret_access_key=" + awsSecretAccessKey +"\""  
+#varsFragmentFoundation = varsFragmentFoundation + " -var=\"_public_access_key=" + awsPublicAccessKey +"\""  
+#varsFragmentFoundation = varsFragmentFoundation + " -var=\"_secret_access_key=" + awsSecretAccessKey +"\""  
+if len(awsPublicAccessKey)>2 or len(awsSecretAccessKey)>2 :  
+  with open(foundationSecretsFile, "w") as file:
+    if len(awsPublicAccessKey) > 2:
+      lineToAdd = "_public_access_key=\""+awsPublicAccessKey +"\"\n"
+      file.write(lineToAdd)
+    if len(awsSecretAccessKey) > 2:
+      lineToAdd = "_secret_access_key=\""+awsSecretAccessKey +"\"\n"
+      file.write(lineToAdd)
+  varsFragmentFoundation = varsFragmentFoundation + " -var-file=\""+ foundationSecretsFile +"\""
+
 varsFoundation = varsFragmentFoundation
 print("varsFoundation is: ", varsFoundation)  
 applyCommandNet = "terraform apply -auto-approve" + varsFoundation
 print("applyCommandNet is: ", applyCommandNet)
+print("dirToUseNet is: ", dirToUseNet)
 runTerraformCommand(applyCommandNet, dirToUseNet)  
+
+print("Finished running apply command. ")
 
 #THE FOLLOWING ARE FOR OTHER MODULES:  
 #varsFragmentFoundation = varsFragmentFoundation + " -var=\"vmName=" + vm_name +"\""  
