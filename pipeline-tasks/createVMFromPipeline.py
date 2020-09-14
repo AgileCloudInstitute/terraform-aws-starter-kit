@@ -96,31 +96,31 @@ storageAccountNameTerraformBackendLine="    storage_account_name = \""+storageAc
 storageContainerNameLine="    container_name       = \""+storageContainerName+"\"\n"	
 terraBackendKeyLine="    key                  = \""+terraKeyFileName+"\"\n"	
 
-tfFileNameAndPath=dirToUseNet+"/terraform.tf"	
-print("tfFileNameAndPath is: ", tfFileNameAndPath)	
-print("About to write 8 lines to a file.")	
-f = open(tfFileNameAndPath, "w")	
-f.write("terraform {\n")	
-f.write("  backend \"azurerm\" {\n")	
-f.write(resourceGroupNameLine)	
-f.write(storageAccountNameTerraformBackendLine)	
-f.write(storageContainerNameLine)	
-f.write(terraBackendKeyLine)	
-f.write("  }\n")	
-f.write("}\n")	
-f.close()	
+# tfFileNameAndPath=dirToUseNet+"/terraform.tf"	
+# print("tfFileNameAndPath is: ", tfFileNameAndPath)	
+# print("About to write 8 lines to a file.")	
+# f = open(tfFileNameAndPath, "w")	
+# f.write("terraform {\n")	
+# f.write("  backend \"azurerm\" {\n")	
+# f.write(resourceGroupNameLine)	
+# f.write(storageAccountNameTerraformBackendLine)	
+# f.write(storageContainerNameLine)	
+# f.write(terraBackendKeyLine)	
+# f.write("  }\n")	
+# f.write("}\n")	
+# f.close()	
 
-print("About to read the file we just wrote.")	
-#open and read the file after the appending:	
-f = open(tfFileNameAndPath, "r")	
-print(f.read()) 	
+# print("About to read the file we just wrote.")	
+# #open and read the file after the appending:	
+# f = open(tfFileNameAndPath, "r")	
+# print(f.read()) 	
 
 print("About to refresh list contents of (DefaultWorkingDirectory)/_terraform-aws-starter-kit/drop/calls-to-modules/aws-simple-network-foundation-call-to-module/")	
 print(*Path(dirToUseNet).iterdir(), sep="\n")	
 
 print("About to call terraform init:  ")	
 initCommand="terraform init -backend=true -backend-config=\"access_key="+terraBackendKey+"\""  	
-runTerraformCommand(initCommand, dirToUseNet )	
+# runTerraformCommand(initCommand, dirToUseNet )	
   
 #############################################################################
 ### Create the network foundation
