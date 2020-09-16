@@ -223,3 +223,30 @@ def getVarsFragmentS3Backend(yamlFileAndPath, vpcId):
         varsFragmentS3Backend = varsFragmentS3Backend + " -var=\""+ key + "=" + my_dict.get(key) +"\""  
   varsFragmentS3Backend = varsFragmentS3Backend + " -var=\"vpcId="+ vpcId +"\""  
   return varsFragmentS3Backend
+
+def getVarsVMFromPipeline( aws_Region, aws_PublicAccessKey, aws_SecretAccessKey, vpc_Id, system_Name, environment_Name, owner_Name, vm_Name, ami_Id, subnet_Id, sg_Id ):
+  varsFragmentVM = ""
+  varsFragmentVM = varsFragmentVM + " -var=\"aws_region=" + aws_Region +"\""  
+  varsFragmentVM = varsFragmentVM + " -var=\"_public_access_key=" + aws_PublicAccessKey +"\""  
+  varsFragmentVM = varsFragmentVM + " -var=\"_secret_access_key=" + aws_SecretAccessKey +"\""  
+  varsFragmentVM = varsFragmentVM + " -var=\"vpcId=" + vpc_Id +"\""  
+  varsFragmentVM = varsFragmentVM + " -var=\"systemName=" + system_Name +"\""  
+  varsFragmentVM = varsFragmentVM + " -var=\"environmentName=" + environment_Name +"\""  
+  varsFragmentVM = varsFragmentVM + " -var=\"ownerName=" + owner_Name +"\""  
+  varsFragmentVM = varsFragmentVM + " -var=\"vmName=" + vm_Name +"\""  
+  varsFragmentVM = varsFragmentVM + " -var=\"amiId=" + ami_Id +"\""  
+  varsFragmentVM = varsFragmentVM + " -var=\"subnetId=" + subnet_Id +"\""  
+  varsFragmentVM = varsFragmentVM + " -var=\"sgId=" + sg_Id +"\""  
+  return varsFragmentVM
+
+def getVarsSGRFromPipeline(aws_Region, aws_PublicAccessKey, aws_SecretAccessKey, vpc_Name, vpc_Id, vpc_Cidr, sg_Id, sg_Name ):
+  varsFragmentSGR = ""
+  varsFragmentSGR = varsFragmentSGR +  " -var=\"aws_region=" + aws_Region +"\""  
+  varsFragmentSGR = varsFragmentSGR +  " -var=\"_public_access_key=" + aws_PublicAccessKey +"\""  
+  varsFragmentSGR = varsFragmentSGR +  " -var=\"_secret_access_key=" + aws_SecretAccessKey +"\""  
+  varsFragmentSGR = varsFragmentSGR +  " -var=\"vpcName=" + vpc_Name +"\""  
+  varsFragmentSGR = varsFragmentSGR +  " -var=\"vpcId=" + vpc_Id +"\""  
+  varsFragmentSGR = varsFragmentSGR +  " -var=\"vpcCidr=" + vpc_Cidr +"\""  
+  varsFragmentSGR = varsFragmentSGR +  " -var=\"sgId=" + sg_Id +"\""  
+  varsFragmentSGR = varsFragmentSGR +  " -var=\"sgName=" + sg_Name +"\""  
+  return varsFragmentSGR
