@@ -20,11 +20,10 @@ terraBackendKey=sys.argv[4]
 awsRegion=sys.argv[5] 	
 DefaultWorkingDirectory=sys.argv[6] 	
 demoStorageKey=sys.argv[7]
+foundationKeyFileTF=sys.argv[8]
 #The following 7 need to be made into input variables	
 resourceGroupName="pipeline-resources"	
-storageAccountNameTerraformBackend='tfbkendabc123x'
 storageContainerName="tfcontainer"
-terraKeyFileName = "aws-simple-network-foundation-state.tf"
 vpc_name="thisVPC"
 system_name="thisSystem"
 environment_name="thisEnvironment"
@@ -39,6 +38,7 @@ print("terraBackendKey is: ", terraBackendKey)
 print("awsRegion is: ", awsRegion)	
 print("DefaultWorkingDirectory is: ", DefaultWorkingDirectory)	
 print("demoStorageKey is: ", demoStorageKey)
+print("foundationKeyFileTF is: ", foundationKeyFileTF)
 foundationSecretsFile = '/home/azureuser/' + 'foundationSecrets.tfvars'
 
 ####################################################################################
@@ -80,7 +80,7 @@ print(*Path(subDir7).iterdir(), sep="\n")
 ##########################################################################################
 ### Initialize terraform and remote backend from inside the network foundation directory
 ##########################################################################################
-depfunc.createBackendConfigFileTerraform(resourceGroupName, storageAccountNameTerraformBackend, storageContainerName, terraKeyFileName, dirToUseNet ) 
+depfunc.createBackendConfigFileTerraform(resourceGroupName, storageAccountNameTerraformBackend, storageContainerName, foundationKeyFileTF, dirToUseNet ) 
 print("About to read the file we just wrote.") 
 tfFileNameAndPath=dirToUseNet+"/terraform.tf" 
 f = open(tfFileNameAndPath, "r") 
@@ -101,11 +101,6 @@ print("applyCommandNet is: ", applyCommandNet)
 print("dirToUseNet is: ", dirToUseNet)
 depfunc.runTerraformCommand(applyCommandNet, dirToUseNet)  
 print("Finished running apply command. ")
-
-#DELETE BY UNCOMMENTING THE FOLLOWING DURING DEVELOPMENT, THEN MAKE SEPARATE FILE FOR RELEASE:  
-# print("About to call terraform destroy.  ")    
-# destroyCommand="terraform destroy -auto-approve" + varsFoundation
-# depfunc.runTerraformCommand(destroyCommand, subDir4 )  
 
 #Finally delete the secrets file fo that the secrets must be retrieved from the key vault every time
 print("About to remove the secrets file. ")
