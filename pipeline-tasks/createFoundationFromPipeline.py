@@ -1,6 +1,5 @@
 ## Copyright 2020 Green River IT (GreenRiverIT.com) as described in LICENSE.txt distributed with this project on GitHub.  
 ## Start at https://github.com/AgileCloudInstitute?tab=repositories    
-
 import sys  	
 import re	
 import os	
@@ -102,12 +101,6 @@ print("applyCommandNet is: ", applyCommandNet)
 print("dirToUseNet is: ", dirToUseNet)
 depfunc.runTerraformCommand(applyCommandNet, dirToUseNet)  
 print("Finished running apply command. ")
-
-#THE FOLLOWING ARE FOR OTHER MODULES:  
-#varsFragmentFoundation = varsFragmentFoundation + " -var=\"vmName=" + vm_name +"\""  
-#varsFragmentFoundation = varsFragmentFoundation + " -var=\"amiId=ami-id-goesw-here\""  
-#varsFragmentFoundation = varsFragmentFoundation + " -var=\"s3BucketNameTF=bucket-name-goes-here\""  
-#varsFragmentFoundation = varsFragmentFoundation + " -var=\"dynamoDbTableNameTF=table-name-goes-here\""  
 
 #DELETE BY UNCOMMENTING THE FOLLOWING DURING DEVELOPMENT, THEN MAKE SEPARATE FILE FOR RELEASE:  
 # print("About to call terraform destroy.  ")    
