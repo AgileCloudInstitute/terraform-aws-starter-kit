@@ -1,6 +1,5 @@
 ## Copyright 2020 Green River IT (GreenRiverIT.com) as described in LICENSE.txt distributed with this project on GitHub.  
 ## Start at https://github.com/AgileCloudInstitute?tab=repositories    
-
 import sys  	
 import re	
 import os	
@@ -9,7 +8,7 @@ from pathlib import Path
 import pip  
 import deploymentFunctions as depfunc  
 
-print("Hello from inside createStarterFromPipeline.py ")  	
+print("Hello from inside destroyFoundationFromPipeline.py ")  	
 
 ###############################################################################
 ### Print vars to validate that they are imported and also obscured
@@ -21,11 +20,10 @@ terraBackendKey=sys.argv[4]
 awsRegion=sys.argv[5] 	
 DefaultWorkingDirectory=sys.argv[6] 	
 demoStorageKey=sys.argv[7]
+foundationKeyFileTF=sys.argv[8]
 #The following 7 need to be made into input variables	
 resourceGroupName="pipeline-resources"	
-storageAccountNameTerraformBackend='tfbkendabc123x'
 storageContainerName="tfcontainer"
-terraKeyFileName = "aws-simple-network-foundation-state.tf"
 vpc_name="thisVPC"
 system_name="thisSystem"
 environment_name="thisEnvironment"
@@ -81,7 +79,7 @@ print(*Path(subDir7).iterdir(), sep="\n")
 ##########################################################################################
 ### Initialize terraform and remote backend from inside the network foundation directory
 ##########################################################################################
-depfunc.createBackendConfigFileTerraform(resourceGroupName, storageAccountNameTerraformBackend, storageContainerName, terraKeyFileName, dirToUseNet ) 
+depfunc.createBackendConfigFileTerraform(resourceGroupName, storageAccountNameTerraformBackend, storageContainerName, foundationKeyFileTF, dirToUseNet ) 
 print("About to read the file we just wrote.") 
 tfFileNameAndPath=dirToUseNet+"/terraform.tf" 
 f = open(tfFileNameAndPath, "r") 
@@ -97,22 +95,12 @@ depfunc.runTerraformCommand(initCommand, dirToUseNet )
 #############################################################################
 varsFoundation = depfunc.getInputVarsFoundationFromPipeline(awsRegion, vpc_name, system_name, environment_name, owner_name, awsPublicAccessKey, awsSecretAccessKey, foundationSecretsFile)  
 print("varsFoundation is: ", varsFoundation)  
-#applyCommandNet = "terraform apply -auto-approve" + varsFoundation
-#print("applyCommandNet is: ", applyCommandNet)
 print("dirToUseNet is: ", dirToUseNet)
-#depfunc.runTerraformCommand(applyCommandNet, dirToUseNet)  
-#print("Finished running apply command. ")
-
-#THE FOLLOWING ARE FOR OTHER MODULES:  
-#varsFragmentFoundation = varsFragmentFoundation + " -var=\"vmName=" + vm_name +"\""  
-#varsFragmentFoundation = varsFragmentFoundation + " -var=\"amiId=ami-id-goesw-here\""  
-#varsFragmentFoundation = varsFragmentFoundation + " -var=\"s3BucketNameTF=bucket-name-goes-here\""  
-#varsFragmentFoundation = varsFragmentFoundation + " -var=\"dynamoDbTableNameTF=table-name-goes-here\""  
 
 #DELETE BY UNCOMMENTING THE FOLLOWING DURING DEVELOPMENT, THEN MAKE SEPARATE FILE FOR RELEASE:  
 print("About to call terraform destroy.  ")    
 destroyCommand="terraform destroy -auto-approve" + varsFoundation
-depfunc.runTerraformCommand(destroyCommand, subDir4 )  
+depfunc.runTerraformCommand(destroyCommand, dirToUseNet )  
 
 #Finally delete the secrets file fo that the secrets must be retrieved from the key vault every time
 print("About to remove the secrets file. ")
