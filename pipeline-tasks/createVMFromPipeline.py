@@ -10,16 +10,6 @@ print("Hello from inside createVMFromPipeline.py ")
 ###############################################################################
 ### Print vars to validate that they are imported and also obscured
 ###############################################################################
-#$(-aws-public-access-key)  
-#$(-aws-secret-access-key)  
-#$(storageAccountNameTerraformBackend)  
-#$(terra-backend-key)  
-#$(aws-region)  
-#$(System.DefaultWorkingDirectory)   
-#$(demoStorageKey)  
-#$(foundationKeyFileTF)  
-#$(vmKeyFileTF)
-
 awsPublicAccessKey=sys.argv[1] 	
 awsSecretAccessKey=sys.argv[2] 	
 storageAccountNameTerraformBackend=sys.argv[3] 	
@@ -32,7 +22,7 @@ vmKeyFileTF=sys.argv[9]
 
 #The following 7 need to be made into input variables	
 resourceGroupName="pipeline-resources"	
-storageContainerName="terraform-backend-aws-starter-kit"
+storageContainerName="tfcontainer"
 vpc_name="thisVPC"
 system_name="thisSystem"
 environment_name="thisEnvironment"
@@ -72,64 +62,37 @@ pathToVirtualMachineCalls=DefaultWorkingDirectory+"/_terraform-aws-starter-kit/d
 print("About to list contents of (DefaultWorkingDirectory)/_terraform-aws-starter-kit/drop/calls-to-modules/aws-simple-vm-call-to-module/")	
 print(*Path(pathToVirtualMachineCalls).iterdir(), sep="\n")	
 
-##########################################################################################
-### Initialize terraform and remote backend from inside the network foundation directory
-##########################################################################################
-resourceGroupNameLine="    resource_group_name  = \""+resourceGroupName+"\"\n"	
-storageAccountNameTerraformBackendLine="    storage_account_name = \""+storageAccountNameTerraformBackend+"\"\n"	
-storageContainerNameLine="    container_name       = \""+storageContainerName+"\"\n"	
-terraBackendKeyLine="    key                  = \""+foundationKeyFileTF+"\"\n"
-
-# tfFileNameAndPath=dirToUseNet+"/terraform.tf"	
-# print("tfFileNameAndPath is: ", tfFileNameAndPath)	
-# print("About to write 8 lines to a file.")	
-# f = open(tfFileNameAndPath, "w")	
-# f.write("terraform {\n")	
-# f.write("  backend \"azurerm\" {\n")	
-# f.write(resourceGroupNameLine)	
-# f.write(storageAccountNameTerraformBackendLine)	
-# f.write(storageContainerNameLine)	
-# f.write(terraBackendKeyLine)	
-# f.write("  }\n")	
-# f.write("}\n")	
-# f.close()	
-
-# print("About to read the file we just wrote.")	
-# #open and read the file after the appending:	
-# f = open(tfFileNameAndPath, "r")	
-# print(f.read()) 	
-
-print("About to refresh list contents of (DefaultWorkingDirectory)/_terraform-aws-starter-kit/drop/calls-to-modules/aws-simple-network-foundation-call-to-module/")	
-print(*Path(pathToFoundationCalls).iterdir(), sep="\n")	
-
+#########################################################################################
+### Get output variables from foundation
+#########################################################################################
 print("About to call terraform output:  ")	
 outputCommand="terraform output" 
 depfunc.runTerraformCommand(outputCommand, pathToFoundationCalls )	
   
-# #############################################################################
-# ### Create the virtual machine
-# #############################################################################
-# #Get Vars to pass into terraform commands:
-varsFragmentVM = ""
-varsFragmentVM = varsFragmentVM + " -var=\"aws_region=" + awsRegion +"\""  
-varsFragmentVM = varsFragmentVM + " -var=\"_public_access_key=" + awsPublicAccessKey +"\""  
-varsFragmentVM = varsFragmentVM + " -var=\"_secret_access_key=" + awsSecretAccessKey +"\""  
-varsFragmentVM = varsFragmentVM + " -var=\"vpcId=" + depfunc.vpc_id +"\""  
-varsFragmentVM = varsFragmentVM + " -var=\"systemName=" + system_name +"\""  
-varsFragmentVM = varsFragmentVM + " -var=\"environmentName=" + environment_name +"\""  
-varsFragmentVM = varsFragmentVM + " -var=\"ownerName=" + owner_name +"\""  
-varsFragmentVM = varsFragmentVM + " -var=\"vmName=" + vm_name +"\""  
-varsFragmentVM = varsFragmentVM + " -var=\"amiId=" + ami_id +"\""  
-varsFragmentVM = varsFragmentVM + " -var=\"subnetId=" + depfunc.subnet_id +"\""  
-varsFragmentVM = varsFragmentVM + " -var=\"sgId=" + depfunc.sg_id +"\""  
+##########################################################################################
+### Initialize terraform and remote backend from inside the virtual machine directory
+##########################################################################################
+#Create the config file for the terraform backend
+depfunc.createBackendConfigFileTerraform(resourceGroupName, storageAccountNameTerraformBackend, storageContainerName, vmKeyFileTF, pathToVirtualMachineCalls )
+tfFileNameAndPath=pathToVirtualMachineCalls+"terraform.tf"
+print("About to read the file we just wrote.")	
+#open and read the file after the appending:	
+f = open(tfFileNameAndPath, "r")	
+print(f.read()) 	
 
-print("varsFragmentVM is: ", varsFragmentVM)  
-applyCommandVM = "terraform apply -auto-approve" + varsFragmentVM
+print("About to refresh list contents of (DefaultWorkingDirectory)/_terraform-aws-starter-kit/drop/calls-to-modules/aws-simple-vm-call-to-module/")	
+print(*Path(pathToVirtualMachineCalls).iterdir(), sep="\n")	
+print("About to call terraform init:  ")	
+initCommand="terraform init -backend=true -backend-config=\"access_key="+demoStorageKey+"\""  	
+depfunc.runTerraformCommand(initCommand, pathToVirtualMachineCalls )	
+
+#############################################################################
+### Create the virtual machine
+#############################################################################
+#Get Vars to pass into terraform commands:
+varsVM=depfunc.getVarsVMFromPipeline( awsRegion, awsPublicAccessKey, awsSecretAccessKey, depfunc.vpc_id, system_name, environment_name, owner_name, vm_name, ami_id, depfunc.subnet_id, depfunc.sg_id )
+print("varsVM is: ", varsVM)  
+#Construct apply command and then create vm
+applyCommandVM = "terraform apply -auto-approve" + varsVM
 print("applyCommandVM is: ", applyCommandVM)
-# #runTerraformCommand(applyCommandNet, dirToUseNet)  
-
-#DELETE BY UNCOMMENTING THE FOLLOWING DURING DEVELOPMENT, THEN MAKE SEPARATE FILE FOR RELEASE:  
-# print("About to call terraform destroy.  ")    
-# destroyCommand="terraform destroy -auto-approve" + varsFoundation
-# runTerraformCommand(destroyCommand, subDir4 )  
-
+depfunc.runTerraformCommand(applyCommandVM, pathToVirtualMachineCalls)  
