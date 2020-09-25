@@ -7,7 +7,7 @@ import subprocess
 from pathlib import Path	
 import pip  
 import deploymentFunctions as depfunc  
-
+ 
 print("Hello from inside createStarterFromPipeline.py ")  	
 
 ###############################################################################
@@ -47,6 +47,21 @@ foundationSecretsFile = '/home/azureuser/' + 'foundationSecrets.tfvars'
 ####################################################################################
 print("About to list contents of DefaultWorkingDirectory")	
 print(*Path(DefaultWorkingDirectory).iterdir(), sep="\n")	
+print("...........................................................................")
+jekyllTop=DefaultWorkingDirectory+"/_jekyll-devserver-aws"
+print("About to list contents of (DefaultWorkingDirectory)/_jekyll-devserver-aws")	
+print(*Path(jekyllTop).iterdir(), sep="\n")	
+print("...........................................................................")
+jekyllDrop=DefaultWorkingDirectory+"/_jekyll-devserver-aws/drop"
+print("About to list contents of (DefaultWorkingDirectory)/_jekyll-devserver-aws/drop")	
+print(*Path(jekyllDrop).iterdir(), sep="\n")	
+print("...........................................................................")
+jekyllPipeTasks=DefaultWorkingDirectory+"/_jekyll-devserver-aws/drop/pipeline-tasks"
+print("About to list contents of (DefaultWorkingDirectory)/_jekyll-devserver-aws/drop/pipeline-tasks")	
+print(*Path(jekyllPipeTasks).iterdir(), sep="\n")	
+
+print("---------------------------------------------------------------------------------------------")
+print("---------------------------------------------------------------------------------------------")
 
 subDir2=DefaultWorkingDirectory+"/_terraform-aws-starter-kit/drop"	
 print("About to list contents of (DefaultWorkingDirectory)/_terraform-aws-starter-kit/drop")	
@@ -77,6 +92,7 @@ subDir7=DefaultWorkingDirectory+"/_terraform-aws-starter-kit/drop/calls-to-modul
 print("About to list contents of (DefaultWorkingDirectory)/_terraform-aws-starter-kit/drop/calls-to-modules/aws-simple-vm-call-to-module/")	
 print(*Path(subDir7).iterdir(), sep="\n")	
 
+# TEMPORARLILY COMMENTING OUT THE BELOW SO THAT WE CAN EXPLORE DIRECTORY STRUCTURE.
 ##########################################################################################
 ### Initialize terraform and remote backend from inside the network foundation directory
 ##########################################################################################
