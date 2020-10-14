@@ -7,9 +7,9 @@ B.  or cloned manually as a simple hands-on experience of using Terraform with A
   
 #  To use this manually:  
 1.  Clone onto a machine on which Terraform has already been installed.  
-2.  Copy the contents of the `Move-This-Directory-Outside-Of-Application-Path` directory to a different location so that any sensitive information like keys that you will put into it will NOT be transported around with the application code.    
-3.  In the `vars/VarsForTerraform/varsFromDevLaptop.yaml` file, place the values for input variables including AWS keys for the AWS account that you will be using to instantiate this example.  
-4.  In a text editor, open up `pipeline-tasks/createFoundation.py` and replace the value of the `pathToApplicationRoot` variable to reflect the location into which you cloned this repository and then replace the value of the `dirOfYamlFile` variable to path of the directory into which you moved the `vars/VarsForTerraform/varsFromDevLaptop.yaml` file. 
+2.  Run [pipeline-tasks/setup.py](https://github.com/AgileCloudInstitute/terraform-aws-starter-kit/blob/master/pipeline-tasks/setup.py) to copy the contents of the `Move-This-Directory-Outside-Of-Application-Path` directory to a different location so that any sensitive information like keys that you will put into it will NOT be transported around with the application code.    
+3.  In the `vars/yamlInputs/varsFromDevLaptop.yaml` file, place the values for input variables that you will be using to instantiate this example.    
+4.  Then in the `vars/yamlInputs/keys.yaml` file, make sure that the `name` property of a key pair record is a combination of a name of a foundationInstance and the term KeyPair as shown in the example given `demoKeyPair` which combines a reference of the foundation instance named `demo` and the term KeyPair.  This naming convension is essential in order for automation in the rest of this starter kit to work.  (Note that pibeline key managemne will be done with a secrets vault, so that this example with `keys.yaml` is just for demonstration.)      
 5.  Open a terminal and navigate to the root directory into which you cloned this repository, then continue navigating to the `pipeline-tasks` subdirectory.  
 6.  Type `python3 createFoundation.py` to create infrastructure on AWS using this example.    
 7.  Note the IP address that is printed in the console as an output variable.  You may have to scroll up for this.  
