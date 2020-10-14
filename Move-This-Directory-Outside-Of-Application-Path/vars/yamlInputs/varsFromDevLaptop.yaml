@@ -24,4 +24,4 @@ securityGroupRules:
     toPort: 4000
     cidrBlocks: public
 blobStorage:
-  - bucketName: demoforawsstarterkit987123
+  - bucketName: demoplusalphanumericstring
