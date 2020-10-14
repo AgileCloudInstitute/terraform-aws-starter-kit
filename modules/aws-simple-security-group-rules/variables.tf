@@ -14,6 +14,10 @@ variable "vpcId" { }
 variable "vpcCidr" { }
 variable "sgId" { }  
 variable "sgName" { }  
+variable "ruleType" { } 
+variable "fromPort" { } 
+variable "toPort" { } 
+variable "cidrBlocks" { } 
   
 data "aws_vpc" "example-vpc" { 
   id   = var.vpcId
@@ -26,5 +30,5 @@ data "aws_vpc" "example-vpc" {
 }
   
 # Workstation External IP. Override with variable or hardcoded value if necessary.
-data "http" "admin-external-ip" { url = "http://ipv4.icanhazip.com" }
-locals { admin-external-cidr = "${chomp(data.http.admin-external-ip.body)}/32" }
+#data "http" "admin-external-ip" { url = "http://ipv4.icanhazip.com" }
+#locals { admin-external-cidr = "${chomp(data.http.admin-external-ip.body)}/32" }

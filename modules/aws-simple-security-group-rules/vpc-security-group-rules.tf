@@ -10,10 +10,10 @@ data "aws_security_group" "example-hosts" {
 }
 
 resource "aws_security_group_rule" "example-admin-ssh" {
-  type = "ingress"
-  from_port = 22
-  to_port = 22
+  type = var.ruleType
+  from_port = var.fromPort
+  to_port = var.toPort
   protocol = "tcp"
-  cidr_blocks       = ["${local.admin-external-cidr}"]
+  cidr_blocks       = [var.cidrBlocks]
   security_group_id        = data.aws_security_group.example-hosts.id
 }

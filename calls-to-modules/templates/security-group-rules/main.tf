@@ -13,6 +13,10 @@ module "aws-simple-security-group-rules" {
   vpcCidr = "${var.vpcCidr}"  
   sgId = "${var.sgId}"  
   sgName = "${var.sgName}"  
+  ruleType = "${var.ruleType}"  
+  fromPort = "${var.fromPort}"  
+  toPort = "${var.toPort}"  
+  cidrBlocks = "${var.cidrBlocks}"  
   
 }  
 
@@ -25,4 +29,7 @@ variable "vpcId" { }
 variable "vpcCidr" { }
 variable "sgId" { }  
 variable "sgName" { } 
-
+variable "ruleType" { } 
+variable "fromPort" { } 
+variable "toPort" { } 
+variable "cidrBlocks" { } 
