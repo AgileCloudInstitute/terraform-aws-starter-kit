@@ -8,6 +8,23 @@ from pathlib import Path
 import platform
 import sys
 
+#############################################################################
+### Import path locations relative to application root
+#############################################################################
+app_parent_path = os.path.dirname(os.path.realpath("..\\"))
+dirOfYamlFile = app_parent_path+"\\config-and-secrets-outside-app-path\\" + "vars\\yamlInputs\\"
+nameOfYamlConfigFile = 'demoConfig.yaml'
+nameOfYamlKeysFile = 'keys.yaml'
+yamlKeysFileAndPath = dirOfYamlFile + nameOfYamlKeysFile 
+pathToApplicationRoot = os.path.dirname(os.path.realpath(""))
+dirOfTfvarsFile = app_parent_path+"\\config-and-secrets-outside-app-path\\vars\\VarsForTerraform\\"
+nameOfTfvarsFile = 'keys.tfvars'
+tfvarsFileAndPath = dirOfTfvarsFile + nameOfTfvarsFile
+
+#############################################################################
+### Import variable values, including CLI arguments if from pipeline
+#############################################################################
+
 #Dummy key values that will be replaced by pipeline inputs
 pub = "empty"
 sec = "empty"
@@ -17,8 +34,17 @@ if len(sys.argv) > 1:
   keySource=sys.argv[1]
   if keySource != "keyVault":
     print("keySource is NOT set to a valid value.  ")
+  # the build config distributed with this repo put the yaml file in the following location for use by pipelines:
+  nameOfYamlConfigFile=sys.argv[2]
+  yamlConfigFileAndPath = pathToApplicationRoot + nameOfYamlConfigFile
+  pub=sys.argv[3]
+  sec=sys.argv[4]
+  storageAccountName=sys.argv[5]
+  demoStorageKey=sys.argv[6]
+  foundationKeyFileTF=sys.argv[7]
 else:  
   keySource = "keyFile"
+  yamlConfigFileAndPath = dirOfYamlFile + nameOfYamlConfigFile
 
 print("keySource is: ", keySource)
 
@@ -179,22 +205,6 @@ def createTheBlobStorageInstance(blobStorageInstance, pathToApplicationRoot, fou
   initCommand = 'terraform init '
   depfunc.runTerraformCommand(initCommand, destinationBlobStorageCallInstance)
   depfunc.runTerraformCommand(applyCommandBlobStorage, destinationBlobStorageCallInstance)
-
-
-
-#############################################################################
-### Import path locations relative to application root
-#############################################################################
-app_parent_path = os.path.dirname(os.path.realpath("..\\"))
-dirOfYamlFile = app_parent_path+"\\config-and-secrets-outside-app-path\\" + "vars\\yamlInputs\\"
-nameOfYamlConfigFile = 'varsFromDevLaptop.yaml'
-yamlConfigFileAndPath = dirOfYamlFile + nameOfYamlConfigFile
-nameOfYamlKeysFile = 'keys.yaml'
-yamlKeysFileAndPath = dirOfYamlFile + nameOfYamlKeysFile 
-pathToApplicationRoot = os.path.dirname(os.path.realpath(""))
-dirOfTfvarsFile = app_parent_path+"\\config-and-secrets-outside-app-path\\vars\\VarsForTerraform\\"
-nameOfTfvarsFile = 'keys.tfvars'
-tfvarsFileAndPath = dirOfTfvarsFile + nameOfTfvarsFile
 
 
 ##############################################################################
