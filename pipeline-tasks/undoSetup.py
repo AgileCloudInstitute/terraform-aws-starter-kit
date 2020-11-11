@@ -17,6 +17,3 @@ except FileNotFoundError:
 
 print("Contents of app parent directory are: ")
 depfunc.runShellCommandInWorkingDir("dir", app_parent_path)
-
-
-
