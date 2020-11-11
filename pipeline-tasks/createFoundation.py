@@ -12,7 +12,6 @@ import sys
 ### Import path locations relative to application root
 #############################################################################
 app_parent_path = os.path.dirname(os.path.realpath("..\\"))
-<<<<<<< HEAD
 configAndSecretsPath = app_parent_path+"\\config-and-secrets-outside-app-path\\" 
 dirOfYamlFile = configAndSecretsPath + "vars\\yamlInputs\\"
 nameOfYamlConfigFile = 'demoConfigDev.yaml'
@@ -20,21 +19,10 @@ nameOfYamlKeysFile = 'keys.yaml'
 yamlKeysFileAndPath = dirOfYamlFile + nameOfYamlKeysFile 
 pathToApplicationRoot = ''  
 tfvarsFileAndPath=''
-=======
-dirOfYamlFile = app_parent_path+"\\config-and-secrets-outside-app-path\\" + "vars\\yamlInputs\\"
-nameOfYamlConfigFile = 'demoConfig.yaml'
-nameOfYamlKeysFile = 'keys.yaml'
-yamlKeysFileAndPath = dirOfYamlFile + nameOfYamlKeysFile 
-pathToApplicationRoot = os.path.dirname(os.path.realpath(""))
-dirOfTfvarsFile = app_parent_path+"\\config-and-secrets-outside-app-path\\vars\\VarsForTerraform\\"
-nameOfTfvarsFile = 'keys.tfvars'
-tfvarsFileAndPath = dirOfTfvarsFile + nameOfTfvarsFile
->>>>>>> ac0a3b861b45a7306429e91c3896cc8010db9031
 
 #############################################################################
 ### Import variable values, including CLI arguments if from pipeline
 #############################################################################
-<<<<<<< HEAD
 dynamicVarsPath = "" 
 if platform.system() == 'Windows':
   dirOfTfvarsFile = app_parent_path+"\\config-and-secrets-outside-app-path\\vars\\VarsForTerraform\\"
@@ -61,13 +49,6 @@ storageContainerName="tfcontainer"
 demoStorageKey=''
 
 #Ingest pipeline variables if they are present
-=======
-
-#Dummy key values that will be replaced by pipeline inputs
-pub = "empty"
-sec = "empty"
-
->>>>>>> ac0a3b861b45a7306429e91c3896cc8010db9031
 print("len(sys.argv) is: ", len(sys.argv))
 if len(sys.argv) > 1:  
   keySource=sys.argv[1]
@@ -75,15 +56,10 @@ if len(sys.argv) > 1:
     print("keySource is NOT set to a valid value.  ")
   # the build config distributed with this repo put the yaml file in the following location for use by pipelines:
   nameOfYamlConfigFile=sys.argv[2]
-<<<<<<< HEAD
-=======
-  yamlConfigFileAndPath = pathToApplicationRoot + nameOfYamlConfigFile
->>>>>>> ac0a3b861b45a7306429e91c3896cc8010db9031
   pub=sys.argv[3]
   sec=sys.argv[4]
   storageAccountName=sys.argv[5]
   demoStorageKey=sys.argv[6]
-<<<<<<< HEAD
   #Next we make the path to application root depend on the DefaultWorkingDirectory from the pipeline agent.  Assuming a linux agent
   pathToApplicationRoot=sys.argv[7] + '/_terraform-aws-starter-kit/drop/' 
   yamlConfigFileAndPath = pathToApplicationRoot+ nameOfYamlConfigFile
@@ -114,45 +90,6 @@ def createTheFoundation(pathToApplicationRoot, yamlConfigFileAndPath, yamlKeysFi
   else:
     destinationFoundationCallParent = pathToApplicationRoot + "/calls-to-modules/instances/network-foundation/"
   destinationFoundationCallInstance = depfunc.instantiateFoundationCallInstance(pathToApplicationRoot, yamlConfigFileAndPath, keySource, demoStorageKey, **kw)
-=======
-  foundationKeyFileTF=sys.argv[7]
-else:  
-  keySource = "keyFile"
-  yamlConfigFileAndPath = dirOfYamlFile + nameOfYamlConfigFile
-
-print("keySource is: ", keySource)
-
-  
-#############################################################################
-### Functions
-#############################################################################
-def createTheFoundation(pathToApplicationRoot, yamlConfigFileAndPath, yamlKeysFileAndPath, tfvarsFileAndPath, keySource, pub, sec):
-  ############################################################################
-  ### Copy the foundation template into a new instance.  Modify for OS. 
-  ############################################################################
-  foundationInstanceName = depfunc.getFoundationInstanceName(yamlConfigFileAndPath)
-  sourceOfFoundationCallTemplate = pathToApplicationRoot + "\\calls-to-modules\\templates\\network-foundation\\"
-  destinationFoundationCallInstance = pathToApplicationRoot + "\\calls-to-modules\\instances\\network-foundation\\"+foundationInstanceName+"-network-foundation\\"  
-  #Create destination directory if it does not already exist 
-  Path(destinationFoundationCallInstance).mkdir(parents=True, exist_ok=True)
-  #Copy config and secret templates outside app path before they can be safely populated
-  copy_tree(sourceOfFoundationCallTemplate, destinationFoundationCallInstance)
-  #Modify main.tf so that it points to the correct module directory
-  fileName = destinationFoundationCallInstance + "main.tf"
-  #Isolating error by commenting the next block.
-  if platform.system() == 'Windows':
-    print("Confirmed this is Windows.  Gonna remove linux syntax by removing line that includes /modules/ ")
-    searchTerm = "/modules/"
-    depfunc.deleteWrongOSPointerLineInCallToNodule(fileName, searchTerm)
-  else: 
-    print("Need to write code to handle Linux separately.  ")
-  newPointerLine="  source = \"..\\\..\\\..\\\..\\\modules\\\\aws-simple-network-foundation\""
-  searchTerm = "\\modules\\"
-  depfunc.changePointerLineInCallToModule(fileName, searchTerm, newPointerLine)
-
-  #\\NOTE: Pipeline version of this will create and use a remote backend.  But here in the demo laptop version we are using a local backend to keep it simple.
-
->>>>>>> ac0a3b861b45a7306429e91c3896cc8010db9031
   #############################################################################
   ### Create the network foundation
   #############################################################################
@@ -160,7 +97,6 @@ def createTheFoundation(pathToApplicationRoot, yamlConfigFileAndPath, yamlKeysFi
   print("varsFragmentNet is: ", varsFragmentNet)  
   applyCommandNet = "terraform apply -auto-approve" + varsFragmentNet
   print("applyCommandNet is: ", applyCommandNet)
-<<<<<<< HEAD
   try: 
     depfunc.runTerraformCommand(applyCommandNet, destinationFoundationCallInstance)
   except NotADirectoryError:
@@ -180,42 +116,6 @@ def createTheVMs(foundationInstanceName, vmInstanceNames, pathToApplicationRoot,
       destinationVirtualMachineCallParent = pathToApplicationRoot + "\\calls-to-modules\\instances\\vm\\"
     else:
       destinationVirtualMachineCallParent = pathToApplicationRoot + "/calls-to-modules/instances/vm/"
-=======
-  initCommand = 'terraform init '
-  depfunc.runTerraformCommand(initCommand, destinationFoundationCallInstance)
-  validationCommand = 'terraform validate'  
-  depfunc.runTerraformCommand(validationCommand, destinationFoundationCallInstance)
-  #upgradeCommand = 'terraform 0.12upgrade -auto-approve'
-  #depfunc.runTerraformCommand(upgradeCommand, destinationFoundationCallInstance)
-  depfunc.runTerraformCommand(applyCommandNet, destinationFoundationCallInstance)
-  #Now delete the tfvars file because we only want keys in the yaml input
-  os.remove(tfvarsFileAndPath)
-
-
-def createTheVMs(foundationInstanceName, vmInstanceNames, pathToApplicationRoot, yamlConfigFileAndPath, yamlKeysFileAndPath, tfvarsFileAndPath, keySource, pub, sec):
-  for vmName in vmInstanceNames: 
-    print("vmName is; ", vmName)
-    sourceOfVirtualMachineCallTemplate = pathToApplicationRoot + "\\calls-to-modules\\templates\\vm\\"
-    destinationVirtualMachineCallInstance = pathToApplicationRoot + "\\calls-to-modules\\instances\\vm\\"+foundationInstanceName+"-"+vmName+"-vm\\"  
-    #Create destination directory if it does not already exist 
-    Path(destinationVirtualMachineCallInstance).mkdir(parents=True, exist_ok=True)
-    #Copy config and secret templates outside app path before they can be safely populated
-    copy_tree(sourceOfVirtualMachineCallTemplate, destinationVirtualMachineCallInstance)
-    #Modify main.tf so that it points to the correct module directory
-    fileName = destinationVirtualMachineCallInstance + "main.tf"
-    #Isolating error by commenting the next block.
-    if platform.system() == 'Windows':
-      print("Confirmed this is Windows.  Gonna remove linux syntax by removing line that includes /modules/ ")
-      searchTerm = "/modules/"
-      depfunc.deleteWrongOSPointerLineInCallToNodule(fileName, searchTerm)
-    else: 
-      print("Need to write code to handle Linux separately.  ")
-    newPointerLine="  source = \"..\\\..\\\..\\\..\\\modules\\\\aws-simple-vm\""
-    #newPointerLine="  source = \"" + destinationVirtualMachineCallInstance + "\"""
-    searchTerm = "\\modules\\"
-    depfunc.changePointerLineInCallToModule(fileName, searchTerm, newPointerLine)
-
->>>>>>> ac0a3b861b45a7306429e91c3896cc8010db9031
     ##############################################################################
     ### Create Virtual Machine and attach to the foundation
     ##############################################################################
@@ -227,7 +127,6 @@ def createTheVMs(foundationInstanceName, vmInstanceNames, pathToApplicationRoot,
     applyCommandCompute = "terraform apply -auto-approve" + varsFragmentCompute
     print("applyCommandCompute is: ", applyCommandCompute)
     # dirToUseVM = pathToApplicationRoot + "calls-to-modules\\aws-simple-vm-call-to-module\\"
-<<<<<<< HEAD
     depfunc.runTerraformCommand(applyCommandCompute, destinationVirtualMachineCallInstance)  
     if depfunc.terraformResult == "Applied": 
       print("Apply operation succeeded for VM.  If it had failed, this block of code would instead automatically quit the program. ")
@@ -255,48 +154,11 @@ def createTheSecurityGroupRule(sgr, pathToApplicationRoot, foundationInstanceNam
     destinationSecurityGroupRuleCallParent = pathToApplicationRoot + "\\calls-to-modules\\instances\\security-group-rules\\"
   else:
     destinationSecurityGroupRuleCallParent = pathToApplicationRoot + "/calls-to-modules/instances/security-group-rules/"
-=======
-    initCommand = 'terraform init '
-    depfunc.runTerraformCommand(initCommand, destinationVirtualMachineCallInstance)
-    depfunc.runTerraformCommand(applyCommandCompute, destinationVirtualMachineCallInstance)  
-
-    if depfunc.terraformResult == "Applied": 
-      print("Apply operation succeeded for VM.  If it had failed, this block of code would instead automatically quit the program. ")
-    else: 
-        quit("Terminating program because the Apply operation failed for a VM in Terraform.")
-
-
-def createTheSecurityGroupRule(sgr, pathToApplicationRoot, foundationInstanceName, yamlConfigFileAndPath, yamlKeysFileAndPath, tfvarsFileAndPath, vpcId, vpcCidr, sgId, sgName, keySource, pub, sec):
-  print("...................................................................................................")
-  print("sgr is: ", sgr)
-  sourceOfSecurityGroupRuleCallTemplate = pathToApplicationRoot + "\\calls-to-modules\\templates\\security-group-rules\\"
-  destinationSecurityGroupRuleCallInstance = pathToApplicationRoot + "\\calls-to-modules\\instances\\security-group-rules\\"+foundationInstanceName+"-"+sgr+"-sgr\\"  
-  print("sourceOfSecurityGroupRuleCallTemplate is: ", sourceOfSecurityGroupRuleCallTemplate)
-  print("destinationSecurityGroupRuleCallInstance is: ", destinationSecurityGroupRuleCallInstance)
-  #Create destination directory if it does not already exist 
-  Path(destinationSecurityGroupRuleCallInstance).mkdir(parents=True, exist_ok=True)
-  #Copy config and secret templates outside app path before they can be safely populated
-  copy_tree(sourceOfSecurityGroupRuleCallTemplate, destinationSecurityGroupRuleCallInstance)
-  #Modify main.tf so that it points to the correct module directory
-  fileName = destinationSecurityGroupRuleCallInstance + "main.tf"
-  #Isolating error by commenting the next block.
-  if platform.system() == 'Windows':
-    print("Confirmed this is Windows.  Gonna remove linux syntax by removing line that includes /modules/ ")
-    searchTerm = "/modules/"
-    depfunc.deleteWrongOSPointerLineInCallToNodule(fileName, searchTerm)
-  else: 
-    print("Need to write code to handle Linux separately.  ")
-  newPointerLine="  source = \"..\\\..\\\..\\\..\\\modules\\\\aws-simple-security-group-rules\""
-  #newPointerLine="  source = \"" + destinationVirtualMachineCallInstance + "\"""
-  searchTerm = "\\modules\\"
-  depfunc.changePointerLineInCallToModule(fileName, searchTerm, newPointerLine)
->>>>>>> ac0a3b861b45a7306429e91c3896cc8010db9031
   varsFragmentSG = depfunc.getVarsFragmentSecurityGroup(sgr, yamlConfigFileAndPath, yamlKeysFileAndPath, tfvarsFileAndPath, vpcId, vpcCidr, sgId, sgName, keySource, pub, sec)  
   print("varsFragmentSG is: ", varsFragmentSG)
   print("----------------------------------------------------------------------------------")
   applyCommandSG = "terraform apply -auto-approve" + varsFragmentSG
   print("applyCommandSG is: ", applyCommandSG)
-<<<<<<< HEAD
   depfunc.runTerraformCommand(applyCommandSG, destinationSecurityGroupRuleCallInstance)
   depfunc.destroyInstanceOfCallToModule(destinationSecurityGroupRuleCallInstance, destinationSecurityGroupRuleCallParent)
 
@@ -307,62 +169,21 @@ def createTheBlobStorageInstance(blobStorageInstance, pathToApplicationRoot, fou
     destinationBlobStorageCallParent = pathToApplicationRoot + "\\calls-to-modules\\instances\\s3-backends\\"
   else:
     destinationBlobStorageCallParent = pathToApplicationRoot + "/calls-to-modules/instances/s3-backends/"
-=======
-  initCommand = 'terraform init '
-  depfunc.runTerraformCommand(initCommand, destinationSecurityGroupRuleCallInstance)
-  depfunc.runTerraformCommand(applyCommandSG, destinationSecurityGroupRuleCallInstance)
-
-def createTheBlobStorageInstance(blobStorageInstance, pathToApplicationRoot, foundationInstanceName, yamlConfigFileAndPath, yamlKeysFileAndPath, tfvarsFileAndPath, vpcId, keySource, pub, sec):
-  print("Inside createTheBlobStorageInstance(), blobStorageInstance is: ", blobStorageInstance)
-  sourceOfBlobStorageCallTemplate = pathToApplicationRoot + "\\calls-to-modules\\templates\\s3-backend\\"
-  destinationBlobStorageCallInstance = pathToApplicationRoot + "\\calls-to-modules\\instances\\s3-backends\\"+foundationInstanceName+"-"+blobStorageInstance+"-s3\\"  
-  print("sourceOfBlobStorageCallTemplate is: ", sourceOfBlobStorageCallTemplate)
-  print("destinationBlobStorageCallInstance is: ", destinationBlobStorageCallInstance)
-  #Create destination directory if it does not already exist 
-  Path(destinationBlobStorageCallInstance).mkdir(parents=True, exist_ok=True)
-  #Copy config and secret templates outside app path before they can be safely populated
-  copy_tree(sourceOfBlobStorageCallTemplate, destinationBlobStorageCallInstance)
-  #
-  #Modify main.tf so that it points to the correct module directory
-  fileName = destinationBlobStorageCallInstance + "main.tf"
-  #Isolating error by commenting the next block.
-  if platform.system() == 'Windows':
-    print("Confirmed this is Windows.  Gonna remove linux syntax by removing line that includes /modules/ ")
-    searchTerm = "/modules/"
-    depfunc.deleteWrongOSPointerLineInCallToNodule(fileName, searchTerm)
-  else: 
-    print("Need to write code to handle Linux separately.  ")
-  newPointerLine="  source = \"..\\\..\\\..\\\..\\\modules\\\\aws-simple-S3-backend\""
-  #newPointerLine="  source = \"" + destinationVirtualMachineCallInstance + "\"""
-  searchTerm = "\\modules\\"
-  depfunc.changePointerLineInCallToModule(fileName, searchTerm, newPointerLine)
->>>>>>> ac0a3b861b45a7306429e91c3896cc8010db9031
   varsFragmentBlobStorage = depfunc.getVarsFragmentBlobStorage(blobStorageInstance, yamlConfigFileAndPath, yamlKeysFileAndPath, tfvarsFileAndPath, vpcId, keySource, pub, sec)  
   print("varsFragmentBlobStorage is: ", varsFragmentBlobStorage)
   print("----------------------------------------------------------------------------------")
   applyCommandBlobStorage = "terraform apply -auto-approve" + varsFragmentBlobStorage
   print("applyCommandBlobStorage is: ", applyCommandBlobStorage)
-<<<<<<< HEAD
   depfunc.runTerraformCommand(applyCommandBlobStorage, destinationBlobStorageCallInstance)
   depfunc.destroyInstanceOfCallToModule(destinationBlobStorageCallInstance, destinationBlobStorageCallParent)
-=======
-  initCommand = 'terraform init '
-  depfunc.runTerraformCommand(initCommand, destinationBlobStorageCallInstance)
-  depfunc.runTerraformCommand(applyCommandBlobStorage, destinationBlobStorageCallInstance)
->>>>>>> ac0a3b861b45a7306429e91c3896cc8010db9031
 
 
 ##############################################################################
 ### Create Infrastructure By Calling The Functions
 ##############################################################################
-<<<<<<< HEAD
 createTheFoundation(pathToApplicationRoot, yamlConfigFileAndPath, yamlKeysFileAndPath, tfvarsFileAndPath, keySource, pub, sec, **params)
 
 # Commenting some of the below during development so that the above can be integrated into the pipeline
-=======
-createTheFoundation(pathToApplicationRoot, yamlConfigFileAndPath, yamlKeysFileAndPath, tfvarsFileAndPath, keySource, pub, sec)
-
->>>>>>> ac0a3b861b45a7306429e91c3896cc8010db9031
 if depfunc.terraformResult == "Applied": 
   print("Apply operation succeeded.  Now inside Python conditional block to do only after the Apply operation has succeeded. ")
   ##############################################################################
@@ -371,44 +192,21 @@ if depfunc.terraformResult == "Applied":
   foundationInstanceName = depfunc.getFoundationInstanceName(yamlConfigFileAndPath)
   vmInstanceNames = depfunc.getVirtualMachineInstanceNames(yamlConfigFileAndPath)
   print("vmInstanceNames is: ", vmInstanceNames)
-<<<<<<< HEAD
   createTheVMs(foundationInstanceName, vmInstanceNames, pathToApplicationRoot, yamlConfigFileAndPath, yamlKeysFileAndPath, tfvarsFileAndPath, ipFileNameAndPath, keySource, demoStorageKey, pub, sec, **params)
-=======
-  createTheVMs(foundationInstanceName, vmInstanceNames, pathToApplicationRoot, yamlConfigFileAndPath, yamlKeysFileAndPath, tfvarsFileAndPath, keySource, pub, sec)
->>>>>>> ac0a3b861b45a7306429e91c3896cc8010db9031
   
   ###############################################################################
   ### Create Security Group Rule and attach to the foundation and VM.  
   ###############################################################################
-<<<<<<< HEAD
   sgrInstanceNames = depfunc.getSecurityGroupRuleInstanceNames(yamlConfigFileAndPath) 
   print("sgrInstanceNames is: ", sgrInstanceNames)
   for sgr in sgrInstanceNames:
       createTheSecurityGroupRule(sgr, pathToApplicationRoot, foundationInstanceName, yamlConfigFileAndPath, yamlKeysFileAndPath, tfvarsFileAndPath, depfunc.vpc_id, depfunc.vpc_cidr, depfunc.sg_id, depfunc.sg_name, keySource, demoStorageKey, pub, sec, **params)
-=======
-  #
-  sgrInstanceNames = depfunc.getSecurityGroupRuleInstanceNames(yamlConfigFileAndPath) 
-  print("sgrInstanceNames is: ", sgrInstanceNames)
-  for sgr in sgrInstanceNames:
-    #Create each security group rule
-    createTheSecurityGroupRule(sgr, pathToApplicationRoot, foundationInstanceName, yamlConfigFileAndPath, yamlKeysFileAndPath, tfvarsFileAndPath, depfunc.vpc_id, depfunc.vpc_cidr, depfunc.sg_id, depfunc.sg_name, keySource, pub, sec)
->>>>>>> ac0a3b861b45a7306429e91c3896cc8010db9031
 
   ################################################################################
   ### Create S3 Backend and attach to the foundation
   ################################################################################
-<<<<<<< HEAD
-=======
-  #Get some input vars from output from the network foundation module.  
-  #depfunc.runTerraformCommand('terraform output', dirToUseNet)
->>>>>>> ac0a3b861b45a7306429e91c3896cc8010db9031
   print("For blobStorage: depfunc.vpc_id is: ", depfunc.vpc_id) 
   blobStorageInstanceNames = depfunc.getBlobStorageInstanceNames(yamlConfigFileAndPath)
   print("blobStorageInstanceNames is:", blobStorageInstanceNames)
   for blobStorageInstance in blobStorageInstanceNames:
-<<<<<<< HEAD
     createTheBlobStorageInstance(blobStorageInstance, pathToApplicationRoot, foundationInstanceName, yamlConfigFileAndPath, yamlKeysFileAndPath, tfvarsFileAndPath, depfunc.vpc_id, keySource, demoStorageKey, pub, sec, **params)
-
-=======
-    createTheBlobStorageInstance(blobStorageInstance, pathToApplicationRoot, foundationInstanceName, yamlConfigFileAndPath, yamlKeysFileAndPath, tfvarsFileAndPath, depfunc.vpc_id, keySource, pub, sec)
->>>>>>> ac0a3b861b45a7306429e91c3896cc8010db9031
