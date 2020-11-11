@@ -6,12 +6,15 @@ import yaml
 import re
 import fileinput 
 import os 
+<<<<<<< HEAD
 import platform
 from distutils.dir_util import copy_tree
 from pathlib import Path
 import shutil
 import sys
 
+=======
+>>>>>>> ac0a3b861b45a7306429e91c3896cc8010db9031
 
 ansi_escape = re.compile(r'\x1B\[[0-?]*[ -/]*[@-~]')
 
@@ -20,7 +23,10 @@ vpc_cidr = ''
 subnet_id = ''  
 sg_id = ''  
 sg_name = ''  
+<<<<<<< HEAD
 vm_ip_pub = ''
+=======
+>>>>>>> ac0a3b861b45a7306429e91c3896cc8010db9031
 terraformResult = ''  
 
 def runShellCommand(commandToRun):
@@ -109,6 +115,7 @@ def getBlobStorageInstanceNames(yamlFileAndPath):
             instanceNames.append(instanceName)
   return instanceNames
 
+<<<<<<< HEAD
 #def getStandaloneVirtualMachineNames(yamlFileAndPath):
 #  vmNames = []
 #  with open(yamlFileAndPath) as f:  
@@ -124,6 +131,8 @@ def getBlobStorageInstanceNames(yamlFileAndPath):
 #            vmNames.append(vmName)
 #  return vmNames
 
+=======
+>>>>>>> ac0a3b861b45a7306429e91c3896cc8010db9031
 def changePointerLineInCallToModule(fileName, searchTerm, newPointerLine): 
   print("inside depfunc.changePointerLineInCallToModule(...)")
   print("newPointerLine is: ", newPointerLine)
@@ -201,11 +210,14 @@ def runTerraformCommand(commandToRun, workingDir ):
           global sg_name
           sg_name=decodedline[10:]
           print("sg_name in deploymentFunctions.py is: ", sg_name)
+<<<<<<< HEAD
         if "public_ip_of_ec2_instance" in decodedline:
           print("Found public_ip_of_ec2_instance!")
           global vm_ip_pub
           vm_ip_pub=decodedline[28:].replace('"', '')
           print("public_ip_of_ec2_instance in deploymentFunctions.py is: ", vm_ip_pub)
+=======
+>>>>>>> ac0a3b861b45a7306429e91c3896cc8010db9031
         if "Destroy complete!" in decodedline:
           print("Found Destroy complete!!")
           global terraformResult
@@ -217,11 +229,15 @@ def runTerraformCommand(commandToRun, workingDir ):
       else:
         break
 
+<<<<<<< HEAD
 def createBackendConfigFileTerraform(dir_to_use_net, **params): 
   resource_group_name = params.get('resGroupName')
   storage_account_name_terraform_backend = params.get('storageAccountNameTerraformBackend')
   storage_container_name = params.get('storContainerName')
   terra_key_file_name = params.get('keyFileTF')
+=======
+def createBackendConfigFileTerraform(resource_group_name, storage_account_name_terraform_backend, storage_container_name, terra_key_file_name, dir_to_use_net ): 
+>>>>>>> ac0a3b861b45a7306429e91c3896cc8010db9031
   resourceGroupNameLine="    resource_group_name  = \""+resource_group_name+"\"\n"	
   storageAccountNameTerraformBackendLine="    storage_account_name = \""+storage_account_name_terraform_backend+"\"\n"	
   storageContainerNameLine="    container_name       = \""+storage_container_name+"\"\n"	
@@ -239,9 +255,12 @@ def createBackendConfigFileTerraform(dir_to_use_net, **params):
   f.write("  }\n")	
   f.write("}\n")	
   f.close()	
+<<<<<<< HEAD
   print("About to read the file we just wrote.") 
   f = open(tfFileNameAndPath, "r") 
   print(f.read())  
+=======
+>>>>>>> ac0a3b861b45a7306429e91c3896cc8010db9031
 
 def getInputVarsFoundationFromPipeline(aws_region, vpcName, systemName, environmentName, owner_name, aws_public_access_key, aws_secret_access_key, foundation_secrets_file):  
   varsFragmentFoundation = ""  
@@ -602,6 +621,7 @@ def getVarsSGRFromPipeline(aws_Region, aws_PublicAccessKey, aws_SecretAccessKey,
   varsFragmentSGR = varsFragmentSGR +  " -var=\"sgId=" + sg_Id +"\""  
   varsFragmentSGR = varsFragmentSGR +  " -var=\"sgName=" + sg_Name +"\""  
   return varsFragmentSGR
+<<<<<<< HEAD
 
 def instantiateFoundationCallInstance(pathToApplicationRoot, yamlConfigFileAndPath, keySource, demoStorageKey, **kw):
   ############################################################################
@@ -815,3 +835,5 @@ def destroyInstanceOfCallToModule(locationOfCallInstance, parentDirOfCallInstanc
   else:
     print("Given Directory doesn't exist: ", parentDirOfCallInstance)
 
+=======
+>>>>>>> ac0a3b861b45a7306429e91c3896cc8010db9031

@@ -20,8 +20,12 @@ steps:
     mv modules $(Build.ArtifactStagingDirectory)
     mv pipeline-tasks $(Build.ArtifactStagingDirectory)
     mv README.md $(Build.ArtifactStagingDirectory)
+<<<<<<< HEAD
     mv Move-This-Directory-Outside-Of-Application-Path/vars/yamlInputs/demoConfigDev.yaml $(Build.ArtifactStagingDirectory)
     mv Move-This-Directory-Outside-Of-Application-Path/vars/yamlInputs/demoConfigTest.yaml $(Build.ArtifactStagingDirectory)
+=======
+    mv Move-This-Directory-Outside-Of-Application-Path/vars/yamlInputs/demoConfig.yaml $(Build.ArtifactStagingDirectory)
+>>>>>>> ac0a3b861b45a7306429e91c3896cc8010db9031
     echo About to list contents of Artifact Staging Directory
     ls -al $(Build.ArtifactStagingDirectory)
   displayName: 'Run a multi-line script'
