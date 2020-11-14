@@ -14,7 +14,7 @@ import sys
 app_parent_path = os.path.dirname(os.path.realpath("..\\"))
 configAndSecretsPath = app_parent_path+"\\config-and-secrets-outside-app-path\\" 
 dirOfYamlFile = configAndSecretsPath + "vars\\yamlInputs\\"
-nameOfYamlConfigFile = 'demoConfigDev.yaml'
+nameOfYamlConfigFile = 'demoConfig.yaml'
 nameOfYamlKeysFile = 'keys.yaml'
 yamlKeysFileAndPath = dirOfYamlFile + nameOfYamlKeysFile 
 pathToApplicationRoot = ''  
@@ -28,7 +28,7 @@ if platform.system() == 'Windows':
   dirOfTfvarsFile = app_parent_path+"\\config-and-secrets-outside-app-path\\vars\\VarsForTerraform\\"
   nameOfTfvarsFile = 'keys.tfvars'
   tfvarsFileAndPath = dirOfTfvarsFile + nameOfTfvarsFile
-  dynamicVarsPath = config_SecretsPath + "\\dynamicvars\\"
+  dynamicVarsPath = configAndSecretsPath + "\\dynamicvars\\"
 else:
   #Consider whether to give a separate variable for the name of each secret file, as in the next line, or alternatively to repopulate the same variable each time as shown in the line that follows the next line.  
   tfvarsFileAndPath = '/home/azureuser/' + 'foundationSecrets.tfvars'
@@ -42,7 +42,7 @@ keySource=''
 yamlConfigFileAndPath = ""
 pub = "empty"
 sec = "empty"
-nameOfYamlConfigFile='demoConfigDev.yaml'
+nameOfYamlConfigFile='demoConfig.yaml'
 resourceGroupName="pipeline-resources" 
 storageAccountName=''
 storageContainerName="tfcontainer"
@@ -85,10 +85,7 @@ params = {
 #############################################################################
 def createTheFoundation(pathToApplicationRoot, yamlConfigFileAndPath, yamlKeysFileAndPath, tfvarsFileAndPath, keySource, pub, sec, **kw):
   foundationInstanceName = depfunc.getFoundationInstanceName(yamlConfigFileAndPath)
-  if platform.system() == 'Windows':
-    destinationFoundationCallParent = pathToApplicationRoot + "\\calls-to-modules\\instances\\network-foundation\\"
-  else:
-    destinationFoundationCallParent = pathToApplicationRoot + "/calls-to-modules/instances/network-foundation/"
+  destinationFoundationCallParent = depfunc.convertPathForOS(pathToApplicationRoot, "\\calls-to-modules\\instances\\network-foundation\\")
   destinationFoundationCallInstance = depfunc.instantiateFoundationCallInstance(pathToApplicationRoot, yamlConfigFileAndPath, keySource, demoStorageKey, **kw)
   #############################################################################
   ### Create the network foundation
@@ -106,16 +103,28 @@ def createTheFoundation(pathToApplicationRoot, yamlConfigFileAndPath, yamlKeysFi
   print("About to remove the secrets file. ")
   #Now delete the tfvars file because we only want keys in external locations such as a vault or the yaml input
   os.remove(tfvarsFileAndPath)
-  depfunc.destroyInstanceOfCallToModule(destinationFoundationCallInstance, destinationFoundationCallParent)
+  if platform.system() == 'Windows':
+    print("You must run the destroyFoundation.py program to destroy all infrastructure you created before you send this back to the git repository.  The reason is that a local Terraform backend is used for this demo so that the instance of the call to module must be retained.  By contrast, when you run this on a Linux agent from a Pipeline, a remote backend will be used to retain Terraform state so that the instance of the call to module can be destroyed at this point when run from a pipeline.  ")
+  else:
+    depfunc.destroyInstanceOfCallToModule(destinationFoundationCallInstance, destinationFoundationCallParent)
+
+def writeIPFile(ipFileAndPath, vm_ip_pub):
+  print("vm_ip_pub is: ", vm_ip_pub)
+  ipLine=vm_ip_pub+"\n"	
+  print("ipFileAndPath is: ", ipFileAndPath)	
+  print("About to write 8 lines to a file.")	
+  f = open(ipFileAndPath, "a")	
+  f.write(ipLine)	
+  f.close()	
+  print("About to read the file we just wrote.") 
+  f = open(ipFileAndPath, "r") 
+  print(f.read())  
 
 def createTheVMs(foundationInstanceName, vmInstanceNames, pathToApplicationRoot, yamlConfigFileAndPath, yamlKeysFileAndPath, tfvarsFileAndPath, ipFile_AndPath, keySource, demoStorageKey, pub, sec, **kw):
   for vmName in vmInstanceNames: 
     print("vmName is; ", vmName)
     destinationVirtualMachineCallInstance = depfunc.instantiateStandaloneVirtualMachineCallInstance(pathToApplicationRoot, yamlConfigFileAndPath, vmName, keySource, demoStorageKey, **kw)
-    if platform.system() == 'Windows':
-      destinationVirtualMachineCallParent = pathToApplicationRoot + "\\calls-to-modules\\instances\\vm\\"
-    else:
-      destinationVirtualMachineCallParent = pathToApplicationRoot + "/calls-to-modules/instances/vm/"
+    destinationVirtualMachineCallParent = depfunc.convertPathForOS(pathToApplicationRoot, "\\calls-to-modules\\instances\\vm\\")
     ##############################################################################
     ### Create Virtual Machine and attach to the foundation
     ##############################################################################
@@ -131,18 +140,12 @@ def createTheVMs(foundationInstanceName, vmInstanceNames, pathToApplicationRoot,
     if depfunc.terraformResult == "Applied": 
       print("Apply operation succeeded for VM.  If it had failed, this block of code would instead automatically quit the program. ")
       #Now record the IP of the VM to a new folder in the application root
-      print("depfunc.vm_ip_pub is: ", depfunc.vm_ip_pub)
-      ipLine=depfunc.vm_ip_pub+"\n"	
-      print("ipFile_AndPath is: ", ipFile_AndPath)	
-      print("About to write 8 lines to a file.")	
-      f = open(ipFile_AndPath, "a")	
-      f.write(ipLine)	
-      f.close()	
-      print("About to read the file we just wrote.") 
-      f = open(ipFile_AndPath, "r") 
-      print(f.read())  
-      #Destroy the instance of the call to module because state is stored in remote Terraform backend
-      depfunc.destroyInstanceOfCallToModule(destinationVirtualMachineCallInstance, destinationVirtualMachineCallParent)
+      writeIPFile(ipFile_AndPath, depfunc.vm_ip_pub)
+      if platform.system() == 'Windows':
+        print("You must run the destroyFoundation.py program to destroy all infrastructure you created before you send this back to the git repository.  The reason is that a local Terraform backend is used for this demo so that the instance of the call to module must be retained.  By contrast, when you run this on a Linux agent from a Pipeline, a remote backend will be used to retain Terraform state so that the instance of the call to module can be destroyed at this point when run from a pipeline.  ")
+      else:
+        #Destroy the instance of the call to module because state is stored in remote Terraform backend
+        depfunc.destroyInstanceOfCallToModule(destinationVirtualMachineCallInstance, destinationVirtualMachineCallParent)
     else: 
       quit("Terminating program because the Apply operation failed for a VM in Terraform.")
 
@@ -150,32 +153,34 @@ def createTheSecurityGroupRule(sgr, pathToApplicationRoot, foundationInstanceNam
   print("...................................................................................................")
   print("sgr is: ", sgr)
   destinationSecurityGroupRuleCallInstance = depfunc.instantiateSecurityGroupRuleCallInstance(pathToApplicationRoot, yamlConfigFileAndPath, sgr, keySource, demoStorageKey, **kw)
-  if platform.system() == 'Windows':
-    destinationSecurityGroupRuleCallParent = pathToApplicationRoot + "\\calls-to-modules\\instances\\security-group-rules\\"
-  else:
-    destinationSecurityGroupRuleCallParent = pathToApplicationRoot + "/calls-to-modules/instances/security-group-rules/"
+  destinationSecurityGroupRuleCallParent = depfunc.convertPathForOS(pathToApplicationRoot, "\\calls-to-modules\\instances\\security-group-rules\\")
   varsFragmentSG = depfunc.getVarsFragmentSecurityGroup(sgr, yamlConfigFileAndPath, yamlKeysFileAndPath, tfvarsFileAndPath, vpcId, vpcCidr, sgId, sgName, keySource, pub, sec)  
   print("varsFragmentSG is: ", varsFragmentSG)
   print("----------------------------------------------------------------------------------")
   applyCommandSG = "terraform apply -auto-approve" + varsFragmentSG
   print("applyCommandSG is: ", applyCommandSG)
   depfunc.runTerraformCommand(applyCommandSG, destinationSecurityGroupRuleCallInstance)
-  depfunc.destroyInstanceOfCallToModule(destinationSecurityGroupRuleCallInstance, destinationSecurityGroupRuleCallParent)
+  if platform.system() == 'Windows':
+    print("You must run the destroyFoundation.py program to destroy all infrastructure you created before you send this back to the git repository.  The reason is that a local Terraform backend is used for this demo so that the instance of the call to module must be retained.  By contrast, when you run this on a Linux agent from a Pipeline, a remote backend will be used to retain Terraform state so that the instance of the call to module can be destroyed at this point when run from a pipeline.  ")
+  else:
+    #Destroy the instance of the call to module because state is stored in remote Terraform backend
+    depfunc.destroyInstanceOfCallToModule(destinationSecurityGroupRuleCallInstance, destinationSecurityGroupRuleCallParent)
 
 def createTheBlobStorageInstance(blobStorageInstance, pathToApplicationRoot, foundationInstanceName, yamlConfigFileAndPath, yamlKeysFileAndPath, tfvarsFileAndPath, vpcId, keySource, demoStorageKey, pub, sec, **kw):
   print("Inside createTheBlobStorageInstance(), blobStorageInstance is: ", blobStorageInstance)
   destinationBlobStorageCallInstance = depfunc.instantiateBlobStorageCallInstance(pathToApplicationRoot, yamlConfigFileAndPath, blobStorageInstance, keySource, demoStorageKey, **kw)
-  if platform.system() == 'Windows':
-    destinationBlobStorageCallParent = pathToApplicationRoot + "\\calls-to-modules\\instances\\s3-backends\\"
-  else:
-    destinationBlobStorageCallParent = pathToApplicationRoot + "/calls-to-modules/instances/s3-backends/"
+  destinationBlobStorageCallParent = depfunc.convertPathForOS(pathToApplicationRoot, "\\calls-to-modules\\instances\\s3-backends\\")
   varsFragmentBlobStorage = depfunc.getVarsFragmentBlobStorage(blobStorageInstance, yamlConfigFileAndPath, yamlKeysFileAndPath, tfvarsFileAndPath, vpcId, keySource, pub, sec)  
   print("varsFragmentBlobStorage is: ", varsFragmentBlobStorage)
   print("----------------------------------------------------------------------------------")
   applyCommandBlobStorage = "terraform apply -auto-approve" + varsFragmentBlobStorage
   print("applyCommandBlobStorage is: ", applyCommandBlobStorage)
   depfunc.runTerraformCommand(applyCommandBlobStorage, destinationBlobStorageCallInstance)
-  depfunc.destroyInstanceOfCallToModule(destinationBlobStorageCallInstance, destinationBlobStorageCallParent)
+  if platform.system() == 'Windows':
+    print("You must run the destroyFoundation.py program to destroy all infrastructure you created before you send this back to the git repository.  The reason is that a local Terraform backend is used for this demo so that the instance of the call to module must be retained.  By contrast, when you run this on a Linux agent from a Pipeline, a remote backend will be used to retain Terraform state so that the instance of the call to module can be destroyed at this point when run from a pipeline.  ")
+  else:
+    #Destroy the instance of the call to module because state is stored in remote Terraform backend
+    depfunc.destroyInstanceOfCallToModule(destinationBlobStorageCallInstance, destinationBlobStorageCallParent)
 
 
 ##############################################################################
@@ -200,7 +205,7 @@ if depfunc.terraformResult == "Applied":
   sgrInstanceNames = depfunc.getSecurityGroupRuleInstanceNames(yamlConfigFileAndPath) 
   print("sgrInstanceNames is: ", sgrInstanceNames)
   for sgr in sgrInstanceNames:
-      createTheSecurityGroupRule(sgr, pathToApplicationRoot, foundationInstanceName, yamlConfigFileAndPath, yamlKeysFileAndPath, tfvarsFileAndPath, depfunc.vpc_id, depfunc.vpc_cidr, depfunc.sg_id, depfunc.sg_name, keySource, demoStorageKey, pub, sec, **params)
+    createTheSecurityGroupRule(sgr, pathToApplicationRoot, foundationInstanceName, yamlConfigFileAndPath, yamlKeysFileAndPath, tfvarsFileAndPath, depfunc.vpc_id, depfunc.vpc_cidr, depfunc.sg_id, depfunc.sg_name, keySource, demoStorageKey, pub, sec, **params)
 
   ################################################################################
   ### Create S3 Backend and attach to the foundation

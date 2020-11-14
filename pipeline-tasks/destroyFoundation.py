@@ -82,10 +82,7 @@ params = {
 
 def destroyTheVMs(pathToApplicationRoot, yamlConfigFileAndPath, yamlKeysFileAndPath, tfvarsFileAndPath, keySource, demoStorageKey, pub, sec, **kw):
   foundationInstanceName = depfunc.getFoundationInstanceName(yamlConfigFileAndPath)
-  if platform.system() == 'Windows':
-    destinationVirtualMachineCallParent = pathToApplicationRoot + "\\calls-to-modules\\instances\\vm\\"
-  else:
-    destinationVirtualMachineCallParent = pathToApplicationRoot + "/calls-to-modules/instances/vm/"
+  destinationVirtualMachineCallParent = depfunc.convertPathForOS(pathToApplicationRoot, "\\calls-to-modules\\instances\\vm\\")
   #Now iterate the VM instances and remove each instance both in the cloud and then locally.
   vmInstanceNames = depfunc.getVirtualMachineInstanceNames(yamlConfigFileAndPath)
   print("vmInstanceNames is: ", vmInstanceNames)
@@ -107,6 +104,10 @@ def destroyTheVMs(pathToApplicationRoot, yamlConfigFileAndPath, yamlKeysFileAndP
       if depfunc.terraformResult == "Destroyed": 
         print("Inside conditional block of things to do if destroy operation completed. ")
         depfunc.destroyInstanceOfCallToModule(destinationVirtualMachineCallInstance, destinationVirtualMachineCallParent)
+      else:
+        print("-------------------------------------------------------------------------------------------------------------------------------")
+        print("ERROR: Failed to destroy this VM named: ", vmName, ".  Continuing gracefully here but a downstream problem may emerge as a result of this failure. ")
+        print("-------------------------------------------------------------------------------------------------------------------------------")
     else:  
       print("The VM specified as \"", vmName, "\" does not have any corresponding call to a module that might manage it.  Either it does not exist or it is outside the scope of this program.  Specifically, the following directory does not exist: ", destinationVirtualMachineCallInstance)
       print("Therefore, we are not processing the request to remove the vm: \"", vmName, "\"")
@@ -114,10 +115,7 @@ def destroyTheVMs(pathToApplicationRoot, yamlConfigFileAndPath, yamlKeysFileAndP
 def getOutputFromFoundation(yamlConfigFileAndPath, pathToApplicationRoot, keySource, demoStorageKey, **kw):
   foundationInstanceName = depfunc.getFoundationInstanceName(yamlConfigFileAndPath)
   destinationFoundationCallInstance = depfunc.instantiateFoundationCallInstance(pathToApplicationRoot, yamlConfigFileAndPath, keySource, demoStorageKey, **kw)
-  if platform.system() == 'Windows':
-    destinationFoundationCallParent = pathToApplicationRoot + "\\calls-to-modules\\instances\\network-foundation\\"
-  else:
-    destinationFoundationCallParent = pathToApplicationRoot + "/calls-to-modules/instances/network-foundation/"
+  destinationFoundationCallParent = depfunc.convertPathForOS(pathToApplicationRoot, "\\calls-to-modules\\instances\\network-foundation\\")
   # Get output from foundation
   outputCommand = 'terraform output '  
   depfunc.runTerraformCommand(outputCommand, destinationFoundationCallInstance)
@@ -127,17 +125,17 @@ def getOutputFromFoundation(yamlConfigFileAndPath, pathToApplicationRoot, keySou
   print("depfunc.vpc_id is: ", depfunc.vpc_id) 
   print("depfunc.subnet_id is: ", depfunc.subnet_id) 
   print("depfunc.sg_id is: ", depfunc.sg_id)
-  depfunc.destroyInstanceOfCallToModule(destinationFoundationCallInstance, destinationFoundationCallParent)
+  if platform.system() == 'Windows':
+    print("Keeping the call to foundation instance at this point to retain local terraform state when the aws network foundation is destroyed later in this script.  Make sure that this and all instances of calls to modules have been programmatically destroyed by this script before returning this to version control. ")
+  else:
+    depfunc.destroyInstanceOfCallToModule(destinationFoundationCallInstance, destinationFoundationCallParent)
 
 def destroyTheFoundation(yamlConfigFileAndPath, pathToApplicationRoot, yamlKeysFileAndPath, tfvarsFileAndPath, keySource, demoStorageKey, pub, sec, **kw):
   ############################################################################
   ### Destroy the Network Foundation 
   ############################################################################
   foundationInstanceName = depfunc.getFoundationInstanceName(yamlConfigFileAndPath)
-  if platform.system() == 'Windows':
-    destinationFoundationCallParent = pathToApplicationRoot + "\\calls-to-modules\\instances\\network-foundation\\"
-  else:
-    destinationFoundationCallParent = pathToApplicationRoot + "/calls-to-modules/instances/network-foundation/"
+  destinationFoundationCallParent = depfunc.convertPathForOS(pathToApplicationRoot, "\\calls-to-modules\\instances\\network-foundation\\")
   destinationFoundationCallInstance = depfunc.instantiateFoundationCallInstance(pathToApplicationRoot, yamlConfigFileAndPath, keySource, demoStorageKey, **kw)
   #\\NOTE: Pipeline version of this will create and use a remote backend.  But here in the demo laptop version we are using a local backend to keep it simple.
   varsFragmentNet = depfunc.getVarsFragmentFoundation(yamlConfigFileAndPath, yamlKeysFileAndPath, tfvarsFileAndPath, keySource, pub, sec)
@@ -161,10 +159,7 @@ def destroyTheFoundation(yamlConfigFileAndPath, pathToApplicationRoot, yamlKeysF
 def destroySecurityGroupRule(sgr, pathToApplicationRoot, foundationInstanceName, yamlConfigFileAndPath, yamlKeysFileAndPath, tfvarsFileAndPath, vpcId, vpcCidr, sgId, sgName, keySource, demoStorageKey, pub, sec, **kw):
   print("sgr is: ", sgr)
   destinationSecurityGroupRuleCallInstance = depfunc.instantiateSecurityGroupRuleCallInstance(pathToApplicationRoot, yamlConfigFileAndPath, sgr, keySource, demoStorageKey, **kw)
-  if platform.system() == 'Windows':
-    destinationSecurityGroupRuleCallParent = pathToApplicationRoot + "\\calls-to-modules\\instances\\security-group-rules\\"
-  else:
-    destinationSecurityGroupRuleCallParent = pathToApplicationRoot + "/calls-to-modules/instances/security-group-rules/"
+  destinationSecurityGroupRuleCallParent = depfunc.convertPathForOS(pathToApplicationRoot, "\\calls-to-modules\\instances\\security-group-rules\\")
   if os.path.exists(destinationSecurityGroupRuleCallInstance) and os.path.isdir(destinationSecurityGroupRuleCallInstance):
     print("destinationSecurityGroupRuleCallInstance is: ", destinationSecurityGroupRuleCallInstance)
     ### 
@@ -192,10 +187,7 @@ def destroyTheBlobStorageInstance(blobStorageInstance, pathToApplicationRoot, fo
   ### Create an instance of the call to the module in the local agent file system for terraform to use in the next step.  
   ### 
   destinationBlobStorageCallInstance = depfunc.instantiateBlobStorageCallInstance(pathToApplicationRoot, yamlConfigFileAndPath, blobStorageInstance, keySource, demoStorageKey, **kw)
-  if platform.system() == 'Windows':
-    destinationBlobStorageCallParent = pathToApplicationRoot + "\\calls-to-modules\\instances\\s3-backends\\"
-  else:
-    destinationBlobStorageCallParent = pathToApplicationRoot + "/calls-to-modules/instances/s3-backends/"
+  destinationBlobStorageCallParent = depfunc.convertPathForOS(pathToApplicationRoot, "\\calls-to-modules\\instances\\s3-backends\\")
   if os.path.exists(destinationBlobStorageCallInstance) and os.path.isdir(destinationBlobStorageCallInstance):
     print("destinationBlobStorageCallInstance is: ", destinationBlobStorageCallInstance)
     ### 

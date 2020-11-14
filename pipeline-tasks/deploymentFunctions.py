@@ -109,21 +109,6 @@ def getBlobStorageInstanceNames(yamlFileAndPath):
             instanceNames.append(instanceName)
   return instanceNames
 
-#def getStandaloneVirtualMachineNames(yamlFileAndPath):
-#  vmNames = []
-#  with open(yamlFileAndPath) as f:  
-#    topLevel_dict = yaml.safe_load(f)
-#    for item in topLevel_dict:
-#      if re.match("standaloneVms", item):
-#        vms = topLevel_dict.get(item)
-#        print("vms is: ", vms)
-#        for vm in vms: 
-#          vmName = vm.get("vmName")
-#          if len(vmName) > 0:
-#            print("len(vmName) is: ", len(vmName))
-#            vmNames.append(vmName)
-#  return vmNames
-
 def changePointerLineInCallToModule(fileName, searchTerm, newPointerLine): 
   print("inside depfunc.changePointerLineInCallToModule(...)")
   print("newPointerLine is: ", newPointerLine)
@@ -142,24 +127,6 @@ def deleteWrongOSPointerLineInCallToNodule(fileName, searchTerm):
         print('', end ='\n') 
       else: 
         print(line, end ='') 
-
-
-# #Took the following from createFoundationFromPipeline.py .  Note to delete this version if tests pass.  
-# #Re-usable function that will be replaced with something already in depfunc
-# def runTerraformCommand(commandToRun, workingDir ):	
-#     print("Inside runTerraformCommand(..., ...) function. ")	
-#     print("commandToRun is: " +commandToRun)	
-#     print("workingDir is: " +workingDir)	
-#     proc = subprocess.Popen( commandToRun,cwd=workingDir,stdout=subprocess.PIPE, shell=True)	
-#     while True:	
-#       line = proc.stdout.readline()	
-#       if line:	
-#         thetext=line.decode('utf-8').rstrip('\r|\n')	
-#         decodedline=ansi_escape.sub('', thetext)	
-#         print(decodedline)	
-#       else:	
-#         print("About to break. ")
-#         break	
 
 def runTerraformCommand(commandToRun, workingDir ):
     print("Inside deploymentFunctions.py script and runTerraformCommand(..., ...) function. ")
@@ -260,29 +227,6 @@ def getInputVarsFoundationFromPipeline(aws_region, vpcName, systemName, environm
         file.write(lineToAdd)
     varsFragmentFoundation = varsFragmentFoundation + " -var-file=\""+ foundation_secrets_file +"\""
   return varsFragmentFoundation
-
-#Old version below being commented out until integration tests run later.  
-#def getVarsFragmentFoundation(yamlConfigFileAndPath):  
-#  varsFragmentFoundation = ""  
-#  with open(yamlConfigFileAndPath) as f:  
-#    my_dict = yaml.safe_load(f)  
-#    for key, value in my_dict.items():  
-#      print(key, " is: ", value)  
-#      if re.match("aws_region", key):  
-#        varsFragmentFoundation = varsFragmentFoundation + " -var=\""+ key + "=" + my_dict.get(key) +"\""  
-#      if re.match("vpcName", key):  
-#        varsFragmentFoundation = varsFragmentFoundation + " -var=\""+ key + "=" + my_dict.get(key) +"\""  
-#      if re.match("systemName", key):  
-#        varsFragmentFoundation = varsFragmentFoundation + " -var=\""+ key + "=" + my_dict.get(key) +"\""  
-#      if re.match("environmentName", key):  
-#        varsFragmentFoundation = varsFragmentFoundation + " -var=\""+ key + "=" + my_dict.get(key) +"\""  
-#      if re.match("ownerName", key):  
-#        varsFragmentFoundation = varsFragmentFoundation + " -var=\""+ key + "=" + my_dict.get(key) +"\""  
-#      if re.match("_public_access_key", key):  
-#        varsFragmentFoundation = varsFragmentFoundation + " -var=\""+ key + "=" + my_dict.get(key) +"\""  
-#      if re.match("_secret_access_key", key):  
-#        varsFragmentFoundation = varsFragmentFoundation + " -var=\""+ key + "=" + my_dict.get(key) +"\""  
-#  return varsFragmentFoundation
 
 def getVarsFragmentFoundation(yamlConfigFileAndPath, yamlKeysFileAndPath, tfvarsFileAndPath, keySource, pub, sec):  
   varsFragmentFoundation = ""
@@ -417,7 +361,6 @@ def getVarsFragmentVM(yamlFileAndPath, yamlKeysFileAndPath, tfvarsFileAndPath, v
 def getVarsFragmentSecurityGroup(sgr, yamlFileAndPath, yamlKeysFileAndPath, tfvarsFileAndPath, vpcId, vpcCidr, sgId, sgName, keySource, pub, sec):  
   print("inside getVarsFragmentSecurityGroup(vpcId)")  
   varsFragmentSecurityGroup = ""  
-  #print("1: varsFragmentSecurityGroup is: ", varsFragmentSecurityGroup)  
   cidrBlocks = ''
   keyPairName = ''
   publicKeyLine = ''
@@ -425,7 +368,6 @@ def getVarsFragmentSecurityGroup(sgr, yamlFileAndPath, yamlKeysFileAndPath, tfva
   with open(yamlFileAndPath) as f:  
     my_dict = yaml.safe_load(f)  
     for key, value in my_dict.items():  
-      #print(key, " is: ", value)  
       if re.match("networkFoundation", key):
         netFoundationItems = my_dict.get(key)
         for networkItem in netFoundationItems:
@@ -439,7 +381,6 @@ def getVarsFragmentSecurityGroup(sgr, yamlFileAndPath, yamlKeysFileAndPath, tfva
         for tag in tags:
           if re.match("networkName", tag):
             varsFragmentSecurityGroup = varsFragmentSecurityGroup + " -var=\"vpcName="+tags.get(tag) +"\""  
-      #/////
       if re.match("securityGroupRules", key):
         sgrs = my_dict.get(key)
         for sgRule in sgrs:
@@ -470,9 +411,7 @@ def getVarsFragmentSecurityGroup(sgr, yamlFileAndPath, yamlKeysFileAndPath, tfva
                     import requests
                     if newDict["cidrBlocks"] == 'admin':
                       adminCidr1 = (requests.get('https://api.ipify.org').text).rstrip() + "/32"
-                      #print('adminCidr1 is:', adminCidr1)
                       adminCidr2 =  (requests.get('http://ipv4.icanhazip.com').text).rstrip() + "/32"
-                      #print('adminCidr2 is:', adminCidr2)
                       if adminCidr1 == adminCidr2:  
                         cidrBlocks = adminCidr1
                         print("The external IP of the agent was validated by two independent sources. ")
@@ -483,13 +422,11 @@ def getVarsFragmentSecurityGroup(sgr, yamlFileAndPath, yamlKeysFileAndPath, tfva
                     else:
                       print("cidr block not valid.")
                     varsFragmentSecurityGroup = varsFragmentSecurityGroup + " -var=\"cidrBlocks="+cidrBlocks +"\""  
-                    #/////
   if keySource == "keyFile":
     if len(keyPairName) > 2:
       with open(yamlKeysFileAndPath) as f:  
         keypairs_dict = yaml.safe_load(f)
         for key, value in keypairs_dict.items():  
-          #print(key, " is: ", value)  
           if re.match("keyPairs", key):
             keyPairs = keypairs_dict.get(key)
             for keyPair in keyPairs:
@@ -505,21 +442,15 @@ def getVarsFragmentSecurityGroup(sgr, yamlFileAndPath, yamlKeysFileAndPath, tfva
     print("Invailid keySource value.  Add error handling here to fit your organization's policites.  ")
 
   if len(publicKeyLine)>2 and len(secretKeyLine)>2:
-    #print("About to open and write to: ", tfvarsFileAndPath)
     f = open(tfvarsFileAndPath, "w")
     f.write(publicKeyLine)
     f.write(secretKeyLine)
     f.close()
-    #print("Finished writing to: ", tfvarsFileAndPath)
-    #print("Contents of tfvarsFileAndPath are: ")
-    #with open(tfvarsFileAndPath, 'r') as fin:
-    #  print(fin.read())
     varsFragmentSecurityGroup = varsFragmentSecurityGroup + " -var-file=\"" + tfvarsFileAndPath +"\""
   varsFragmentSecurityGroup = varsFragmentSecurityGroup + " -var=\"vpcId="+ vpcId +"\""  
   varsFragmentSecurityGroup = varsFragmentSecurityGroup + " -var=\"vpcCidr="+ vpcCidr +"\""  
   varsFragmentSecurityGroup = varsFragmentSecurityGroup + " -var=\"sgId="+ sgId +"\""  
   varsFragmentSecurityGroup = varsFragmentSecurityGroup + " -var=\"sgName="+ sgName +"\""  
-  #print("5: varsFragmentSecurityGroup is: ", varsFragmentSecurityGroup)
   return varsFragmentSecurityGroup  
   
 def getVarsFragmentBlobStorage(blobStorageInstance, yamlFileAndPath, yamlKeysFileAndPath, tfvarsFileAndPath, vpcId, keySource, pub, sec) :  
@@ -603,208 +534,120 @@ def getVarsSGRFromPipeline(aws_Region, aws_PublicAccessKey, aws_SecretAccessKey,
   varsFragmentSGR = varsFragmentSGR +  " -var=\"sgName=" + sg_Name +"\""  
   return varsFragmentSGR
 
-def instantiateFoundationCallInstance(pathToApplicationRoot, yamlConfigFileAndPath, keySource, demoStorageKey, **kw):
-  ############################################################################
-  ### Copy the foundation template into a new instance.  Modify for OS. 
-  ############################################################################
-  foundationInstanceName = getFoundationInstanceName(yamlConfigFileAndPath)
+def convertPathForOS(pathToApplicationRoot, relativePath):
+  print("platform.system() is: ", platform.system())
   if platform.system() == 'Windows':
-    sourceOfFoundationCallTemplate = pathToApplicationRoot + "\\calls-to-modules\\templates\\network-foundation\\"
-    destinationFoundationCallInstance = pathToApplicationRoot + "\\calls-to-modules\\instances\\network-foundation\\"+foundationInstanceName+"-network-foundation\\"  
+    if '/' in relativePath:
+      relativePath = relativePath.replace("/", "\\\\")
+    destinationCallParent = pathToApplicationRoot + relativePath
   else:
-    sourceOfFoundationCallTemplate = pathToApplicationRoot + "calls-to-modules/templates/network-foundation/"
-    destinationFoundationCallInstance = pathToApplicationRoot + "calls-to-modules/instances/network-foundation/"+foundationInstanceName+"-network-foundation/"  
-  #Create destination directory if it does not already exist 
-  Path(destinationFoundationCallInstance).mkdir(parents=True, exist_ok=True)
-  #Copy config and secret templates outside app path before they can be safely populated
-  copy_tree(sourceOfFoundationCallTemplate, destinationFoundationCallInstance)
-  #Modify main.tf so that it points to the correct module directory
-  fileName = destinationFoundationCallInstance + "main.tf"
-  #Isolating error by commenting the next block.
-  if platform.system() == 'Windows':
-    print("Confirmed this is Windows.  Gonna remove linux syntax by removing line that includes /modules/ ")
-    searchTerm = "/modules/"
-    deleteWrongOSPointerLineInCallToNodule(fileName, searchTerm)
-    newPointerLine="  source = \"..\\\..\\\..\\\..\\\modules\\\\aws-simple-network-foundation\""
-    searchTerm = "\\modules\\"
-    changePointerLineInCallToModule(fileName, searchTerm, newPointerLine)
-  else: 
-    searchTerm = "\\modules\\"
-    deleteWrongOSPointerLineInCallToNodule(fileName, searchTerm)
-    newPointerLine="  source = \"../../../../modules/aws-simple-network-foundation\""
-    searchTerm = "/modules/"
-    changePointerLineInCallToModule(fileName, searchTerm, newPointerLine)
-  #\\NOTE: Pipeline version of this will create and use a remote backend.  But here in the demo laptop version we are using a local backend to keep it simple.
-  ##############################################################################################################################
-  ### Initialize terraform from inside the network foundation directory.  Conditionally make backend remote if from pipeline
-  ##############################################################################################################################
+    if '\\' in relativePath:
+      relativePath = relativePath.replace('\\', '/')
+    destinationCallParent = pathToApplicationRoot + relativePath
+  return destinationCallParent
+
+def createCallDirectoryAndFile(sourceOfCallTemplate, destinationCallInstance, newPointerLineWindows, newPointerLineLinux):
+    Path(destinationCallInstance).mkdir(parents=True, exist_ok=True)
+    copy_tree(sourceOfCallTemplate, destinationCallInstance)
+    fileName = destinationCallInstance + "main.tf"
+    if platform.system() == 'Windows':
+      print("Confirmed this is Windows.  Gonna remove linux syntax by removing line that includes /modules/ ")
+      searchTerm = "/modules/"
+      deleteWrongOSPointerLineInCallToNodule(fileName, searchTerm)
+      searchTerm = "\\modules\\"
+      changePointerLineInCallToModule(fileName, searchTerm, newPointerLineWindows)
+    else: 
+      searchTerm = "\\modules\\"
+      deleteWrongOSPointerLineInCallToNodule(fileName, searchTerm)
+      searchTerm = "/modules/"
+      changePointerLineInCallToModule(fileName, searchTerm, newPointerLineLinux)
+
+def initializeTerraformBackend(keySource, keyFile, destinationCallInstance, demoStorageKey, **kw):
   if keySource == "keyVault":
-    kw['keyFileTF']  =  foundationInstanceName + "-networkFoundation"
-    createBackendConfigFileTerraform(destinationFoundationCallInstance, **kw) 
-    print("About to refresh list contents of (DefaultWorkingDirectory)/_terraform-aws-starter-kit/drop/calls-to-modules/aws-simple-network-foundation-call-to-module/")	
-    print(*Path(destinationFoundationCallInstance).iterdir(), sep="\n") 
-    print("About to call terraform init:  ")	
+    kw['keyFileTF']  =  keyFile 
+    createBackendConfigFileTerraform(destinationCallInstance, **kw) 
     initCommand="terraform init -backend=true -backend-config=\"access_key="+demoStorageKey+"\""  	
   else:
     initCommand = 'terraform init '
-  runTerraformCommand(initCommand, destinationFoundationCallInstance )	
+  runTerraformCommand(initCommand, destinationCallInstance )	
   #Add error handling to validate that init command succeeded.
+
+
+def instantiateFoundationCallInstance(pathToApplicationRoot, yamlConfigFileAndPath, keySource, demoStorageKey, **kw):
+  foundationInstanceName = getFoundationInstanceName(yamlConfigFileAndPath)
+  relativePathTemplate = "\\calls-to-modules\\templates\\network-foundation\\"
+  relativePathInstance = "\\calls-to-modules\\instances\\network-foundation\\"+foundationInstanceName+"-network-foundation\\"  
+  sourceOfFoundationCallTemplate = convertPathForOS(pathToApplicationRoot, relativePathTemplate)
+  destinationFoundationCallInstance = convertPathForOS(pathToApplicationRoot, relativePathInstance)
+  p = Path(destinationFoundationCallInstance)
+  if p.exists():
+    print("The instance of the call to module already exists.  Make sure to run destroyFoundation.py to destroy the directory structure of all instances of calls to modules before you send this back to version control.")
+  else:
+    newPointerLineWindows="  source = \"..\\\..\\\..\\\..\\\modules\\\\aws-simple-network-foundation\""
+    newPointerLineLinux="  source = \"../../../../modules/aws-simple-network-foundation\""
+    createCallDirectoryAndFile(sourceOfFoundationCallTemplate, destinationFoundationCallInstance, newPointerLineWindows, newPointerLineLinux)
+  keyFile = foundationInstanceName + "-networkFoundation"
+  initializeTerraformBackend(keySource, keyFile, destinationFoundationCallInstance, demoStorageKey, **kw)
   return destinationFoundationCallInstance
 
 def instantiateBlobStorageCallInstance(pathToApplicationRoot, yamlConfigFileAndPath, blobStorageInstance, keySource, demoStorageKey, **kw):
-  ############################################################################
-  ### Copy the blob storsge template into a new instance.  Modify for OS. 
-  ############################################################################
   foundationInstanceName = getFoundationInstanceName(yamlConfigFileAndPath)
-  if platform.system() == 'Windows':
-    sourceOfBlobStorageCallTemplate = pathToApplicationRoot + "\\calls-to-modules\\templates\\s3-backend\\"
-    destinationBlobStorageCallInstance = pathToApplicationRoot + "\\calls-to-modules\\instances\\s3-backends\\"+foundationInstanceName+"-"+blobStorageInstance+"-s3\\"  
+  relativePathTemplate = "\\calls-to-modules\\templates\\s3-backend\\"
+  relativePathInstance = "\\calls-to-modules\\instances\\s3-backends\\"+foundationInstanceName+"-"+blobStorageInstance+"-s3\\" 
+  sourceOfBlobStorageCallTemplate = convertPathForOS(pathToApplicationRoot, relativePathTemplate)
+  destinationBlobStorageCallInstance = convertPathForOS(pathToApplicationRoot, relativePathInstance)
+  p = Path(destinationBlobStorageCallInstance)
+  if p.exists():
+    print("The instance of the call to module already exists.  Make sure to run destroyFoundation.py to destroy the directory structure of all instances of calls to modules before you send this back to version control.")
   else:
-    sourceOfBlobStorageCallTemplate = pathToApplicationRoot + "calls-to-modules/templates/s3-backend/"
-    destinationBlobStorageCallInstance = pathToApplicationRoot + "calls-to-modules/instances/s3-backend/"+foundationInstanceName+"-"+blobStorageInstance+"-s3/"  
-  #Create destination directory if it does not already exist 
-  Path(destinationBlobStorageCallInstance).mkdir(parents=True, exist_ok=True)
-  #Copy config and secret templates outside app path before they can be safely populated
-  copy_tree(sourceOfBlobStorageCallTemplate, destinationBlobStorageCallInstance)
-  #Modify main.tf so that it points to the correct module directory
-  fileName = destinationBlobStorageCallInstance + "main.tf"
-  #Isolating error by commenting the next block.
-  if platform.system() == 'Windows':
-    print("Confirmed this is Windows.  Gonna remove linux syntax by removing line that includes /modules/ ")
-    searchTerm = "/modules/"
-    deleteWrongOSPointerLineInCallToNodule(fileName, searchTerm)
-    newPointerLine="  source = \"..\\\..\\\..\\\..\\\modules\\\\aws-simple-S3-backend\""
-    searchTerm = "\\modules\\"
-    changePointerLineInCallToModule(fileName, searchTerm, newPointerLine)
-  else: 
-    searchTerm = "\\modules\\"
-    deleteWrongOSPointerLineInCallToNodule(fileName, searchTerm)
-    newPointerLine="  source = \"../../../../modules/aws-simple-S3-backend\""
-    searchTerm = "/modules/"
-    changePointerLineInCallToModule(fileName, searchTerm, newPointerLine)
-  #\\NOTE: Pipeline version of this will create and use a remote backend.  But here in the demo laptop version we are using a local backend to keep it simple.
-  ##############################################################################################################################
-  ### Initialize terraform from inside the network foundation directory.  Conditionally make backend remote if from pipeline
-  ##############################################################################################################################
-  kw['keyFileTF']  =  foundationInstanceName + "-" + blobStorageInstance + "-s3"
-  if keySource == "keyVault":
-    createBackendConfigFileTerraform(destinationBlobStorageCallInstance, **kw) 
-    print("About to refresh list contents of: ", destinationBlobStorageCallInstance)	
-    print(*Path(destinationBlobStorageCallInstance).iterdir(), sep="\n") 
-    print("About to call terraform init:  ")	
-    initCommand="terraform init -backend=true -backend-config=\"access_key="+demoStorageKey+"\""  	
-  else:
-    initCommand = 'terraform init '
-  runTerraformCommand(initCommand, destinationBlobStorageCallInstance )	
-  #Add error handling to validate that init command succeeded.
+    newPointerLineWindows="  source = \"..\\\..\\\..\\\..\\\modules\\\\aws-simple-S3-backend\""
+    newPointerLineLinux="  source = \"../../../../modules/aws-simple-S3-backend\""
+    createCallDirectoryAndFile(sourceOfBlobStorageCallTemplate, destinationBlobStorageCallInstance, newPointerLineWindows, newPointerLineLinux)
+  keyFile = foundationInstanceName + "-" + blobStorageInstance + "-s3" 
+  initializeTerraformBackend(keySource, keyFile, destinationBlobStorageCallInstance, demoStorageKey, **kw)
   return destinationBlobStorageCallInstance
 
 def instantiateStandaloneVirtualMachineCallInstance(pathToApplicationRoot, yamlConfigFileAndPath, vmInstance, keySource, demoStorageKey, **kw):
-  ############################################################################
-  ### Copy the virtual machine call template into a new instance.  Modify for OS. 
-  ############################################################################
   foundationInstanceName = getFoundationInstanceName(yamlConfigFileAndPath)
-  if platform.system() == 'Windows':
-    sourceOfVirtualMachineCallTemplate = pathToApplicationRoot + "\\calls-to-modules\\templates\\vm\\"
-    destinationVirtualMachineCallInstance = pathToApplicationRoot + "\\calls-to-modules\\instances\\vm\\"+foundationInstanceName+"-"+vmInstance+"-vm\\"  
+  relativePathTemplate = "\\calls-to-modules\\templates\\vm\\"
+  relativePathInstance = "\\calls-to-modules\\instances\\vm\\"+foundationInstanceName+"-"+vmInstance+"-vm\\"  
+  sourceOfVirtualMachineCallTemplate = convertPathForOS(pathToApplicationRoot, relativePathTemplate)
+  destinationVirtualMachineCallInstance = convertPathForOS(pathToApplicationRoot, relativePathInstance)
+  p = Path(destinationVirtualMachineCallInstance)
+  if p.exists():
+    print("The instance of the call to module already exists.  Make sure to run destroyFoundation.py to destroy the directory structure of all instances of calls to modules before you send this back to version control.")
   else:
-    sourceOfVirtualMachineCallTemplate = pathToApplicationRoot + "calls-to-modules/templates/vm/"
-    destinationVirtualMachineCallInstance = pathToApplicationRoot + "calls-to-modules/instances/vm/"+foundationInstanceName+"-"+vmInstance+"-vm/"  
-  #Create destination directory if it does not already exist 
-  Path(destinationVirtualMachineCallInstance).mkdir(parents=True, exist_ok=True)
-  #Copy config and secret templates outside app path before they can be safely populated
-  copy_tree(sourceOfVirtualMachineCallTemplate, destinationVirtualMachineCallInstance)
-  #Modify main.tf so that it points to the correct module directory
-  fileName = destinationVirtualMachineCallInstance + "main.tf"
-  #Isolating error by commenting the next block.
-  if platform.system() == 'Windows':
-    print("Confirmed this is Windows.  Gonna remove linux syntax by removing line that includes /modules/ ")
-    searchTerm = "/modules/"
-    deleteWrongOSPointerLineInCallToNodule(fileName, searchTerm)
-    newPointerLine="  source = \"..\\\..\\\..\\\..\\\modules\\\\aws-simple-vm\""
-    searchTerm = "\\modules\\"
-    changePointerLineInCallToModule(fileName, searchTerm, newPointerLine)
-  else: 
-    searchTerm = "\\modules\\"
-    deleteWrongOSPointerLineInCallToNodule(fileName, searchTerm)
-    newPointerLine="  source = \"../../../../modules/aws-simple-vm\""
-    searchTerm = "/modules/"
-    changePointerLineInCallToModule(fileName, searchTerm, newPointerLine)
-  #\\NOTE: Pipeline version of this will create and use a remote backend.  But here in the demo laptop version we are using a local backend to keep it simple.
-  ##############################################################################################################################
-  ### Initialize terraform from inside the network foundation directory.  Conditionally make backend remote if from pipeline
-  ##############################################################################################################################
-  kw['keyFileTF']  =  foundationInstanceName + "-" + vmInstance + "-vm"
-  if keySource == "keyVault":
-    createBackendConfigFileTerraform(destinationVirtualMachineCallInstance, **kw) 
-    print("About to refresh list contents of: ", destinationVirtualMachineCallInstance)	
-    print(*Path(destinationVirtualMachineCallInstance).iterdir(), sep="\n") 
-    print("About to call terraform init:  ")	
-    initCommand="terraform init -backend=true -backend-config=\"access_key="+demoStorageKey+"\""  	
-  else:
-    initCommand = 'terraform init '
-  runTerraformCommand(initCommand, destinationVirtualMachineCallInstance )	
-  #Add error handling to validate that init command succeeded.
+    newPointerLineWindows="  source = \"..\\\..\\\..\\\..\\\modules\\\\aws-simple-vm\""
+    newPointerLineLinux="  source = \"../../../../modules/aws-simple-vm\""
+    createCallDirectoryAndFile(sourceOfVirtualMachineCallTemplate, destinationVirtualMachineCallInstance, newPointerLineWindows, newPointerLineLinux)
+  keyFile = foundationInstanceName + "-" + vmInstance + "-vm" 
+  initializeTerraformBackend(keySource, keyFile, destinationVirtualMachineCallInstance, demoStorageKey, **kw)
   return destinationVirtualMachineCallInstance
 
 def instantiateSecurityGroupRuleCallInstance(pathToApplicationRoot, yamlConfigFileAndPath, sgr, keySource, demoStorageKey, **kw):
-  ############################################################################
-  ### Copy the virtual machine call template into a new instance.  Modify for OS. 
-  ############################################################################
   foundationInstanceName = getFoundationInstanceName(yamlConfigFileAndPath)
-  if platform.system() == 'Windows':
-    sourceOfSecurityGroupRuleCallTemplate = pathToApplicationRoot + "\\calls-to-modules\\templates\\security-group-rules\\"
-    destinationSecurityGroupRuleCallInstance = pathToApplicationRoot + "\\calls-to-modules\\instances\\security-group-rules\\"+foundationInstanceName+"-"+sgr+"-sgr\\"  
+  relativePathTemplate = "\\calls-to-modules\\templates\\security-group-rules\\"
+  relativePathInstance = "\\calls-to-modules\\instances\\security-group-rules\\"+foundationInstanceName+"-"+sgr+"-sgr\\"  
+  sourceOfSecurityGroupRuleCallTemplate = convertPathForOS(pathToApplicationRoot, relativePathTemplate)
+  destinationSecurityGroupRuleCallInstance = convertPathForOS(pathToApplicationRoot, relativePathInstance)
+  p = Path(destinationSecurityGroupRuleCallInstance)
+  if p.exists():
+    print("The instance of the call to module already exists.  Make sure to run destroyFoundation.py to destroy the directory structure of all instances of calls to modules before you send this back to version control.")
   else:
-    sourceOfSecurityGroupRuleCallTemplate = pathToApplicationRoot + "calls-to-modules/templates/security-group-rules/"
-    destinationSecurityGroupRuleCallInstance = pathToApplicationRoot + "/calls-to-modules/instances/security-group-rules/"+foundationInstanceName+"-"+sgr+"-sgr/"  
-  #Create destination directory if it does not already exist 
-  Path(destinationSecurityGroupRuleCallInstance).mkdir(parents=True, exist_ok=True)
-  #Copy config and secret templates outside app path before they can be safely populated
-  copy_tree(sourceOfSecurityGroupRuleCallTemplate, destinationSecurityGroupRuleCallInstance)
-  #Modify main.tf so that it points to the correct module directory
-  fileName = destinationSecurityGroupRuleCallInstance + "main.tf"
-  if platform.system() == 'Windows':
-    print("Confirmed this is Windows.  Gonna remove linux syntax by removing line that includes /modules/ ")
-    searchTerm = "/modules/"
-    deleteWrongOSPointerLineInCallToNodule(fileName, searchTerm)
-    newPointerLine="  source = \"..\\\..\\\..\\\..\\\modules\\\\aws-simple-security-group-rules\""
-    searchTerm = "\\modules\\"
-    changePointerLineInCallToModule(fileName, searchTerm, newPointerLine)
-  else: 
-    searchTerm = "\\modules\\"
-    deleteWrongOSPointerLineInCallToNodule(fileName, searchTerm)
-    newPointerLine="  source = \"../../../../modules/aws-simple-security-group-rules\""
-    searchTerm = "/modules/"
-    changePointerLineInCallToModule(fileName, searchTerm, newPointerLine)
-  ##############################################################################################################################
-  ### Initialize terraform from inside the network foundation directory.  Conditionally make backend remote if from pipeline
-  ##############################################################################################################################
-  kw['keyFileTF']  =  foundationInstanceName + "-" + sgr + "-sgr"
-  if keySource == "keyVault":
-    createBackendConfigFileTerraform(destinationSecurityGroupRuleCallInstance, **kw) 
-    print("About to refresh list contents of: ", destinationSecurityGroupRuleCallInstance)	
-    print(*Path(destinationSecurityGroupRuleCallInstance).iterdir(), sep="\n") 
-    print("About to call terraform init:  ")	
-    initCommand="terraform init -backend=true -backend-config=\"access_key="+demoStorageKey+"\""  	
-  else:
-    initCommand = 'terraform init '
-  runTerraformCommand(initCommand, destinationSecurityGroupRuleCallInstance )	
-  #Add error handling to validate that init command succeeded.
+    newPointerLineWindows="  source = \"..\\\..\\\..\\\..\\\modules\\\\aws-simple-security-group-rules\""
+    newPointerLineLinux="  source = \"../../../../modules/aws-simple-security-group-rules\""
+    createCallDirectoryAndFile(sourceOfSecurityGroupRuleCallTemplate, destinationSecurityGroupRuleCallInstance, newPointerLineWindows, newPointerLineLinux)
+  keyFile = foundationInstanceName + "-" + sgr + "-sgr"
+  initializeTerraformBackend(keySource, keyFile, destinationSecurityGroupRuleCallInstance, demoStorageKey, **kw)
   return destinationSecurityGroupRuleCallInstance
 
 def destroyInstanceOfCallToModule(locationOfCallInstance, parentDirOfCallInstance):
-  #remove the instance of the call to the module, including its directory and any contents of that directory.  
   if os.path.exists(locationOfCallInstance) and os.path.isdir(locationOfCallInstance):
-    #if not os.listdir(destinationVirtualMachineCallInstance):
     print("Directory is empty")
     path = Path(locationOfCallInstance)
     shutil.rmtree(path)
-    #else:    
-    #  print("Instance directory is not empty, so we will keep it for now:  ", destinationVirtualMachineCallInstance)
   else:
     print("Given Directory doesn't exist: ", locationOfCallInstance)
-  #If parent is empty, delete parent directory also.  Otherwise, if parent directory is NOT empty, leave parent directory as-is.
   if os.path.exists(parentDirOfCallInstance) and os.path.isdir(parentDirOfCallInstance):
     if not os.listdir(parentDirOfCallInstance):
       print("Directory is empty")
